@@ -1,0 +1,365 @@
+<title>Chess Arm Concept</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one drafting sheet, sections stacked; each figure sits on a gridded plate with its notes beside it */
+:root{
+  --paper:#F2F4F1; --plate:#FBFCFA; --ink:#1C2320; --muted:#5D6A64; --rule:#CCD4CF; --grid:#E4E9E5;
+  --arm:#0E6B66; --arm-soft:#0E6B6622; --hot:#B9770E; --warn:#B3261E;
+  --sq-l:#E6DFCE; --sq-d:#AD9E80; --sq-t:#5A4E37;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#111614; --plate:#171D1A; --ink:#E3EAE6; --muted:#93A29B; --rule:#2D3833; --grid:#1F2824;
+  --arm:#46C4B9; --arm-soft:#46C4B922; --hot:#E6B44A; --warn:#F07A70;
+  --sq-l:#4C473A; --sq-d:#2F2C24; --sq-t:#CFC3A6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111614; --plate:#171D1A; --ink:#E3EAE6; --muted:#93A29B; --rule:#2D3833; --grid:#1F2824;
+  --arm:#46C4B9; --arm-soft:#46C4B922; --hot:#E6B44A; --warn:#F07A70;
+  --sq-l:#4C473A; --sq-d:#2F2C24; --sq-t:#CFC3A6; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:48px}
+header{display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--rule);padding-bottom:20px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(30px,5vw,46px)/1.05 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 24px/1.2 var(--display);margin:0;text-wrap:balance}
+p{margin:0;max-width:65ch}
+.lede{color:var(--muted);font-size:16px}
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+.plate{background:var(--plate);border:1px solid var(--rule);border-radius:4px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px;overflow-x:auto}
+.plate svg{display:block;width:100%;height:auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.two>*{min-width:0}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.cap{font:12px/1.4 var(--mono);color:var(--muted);padding:8px 12px;border-top:1px solid var(--rule);background:var(--plate)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:500 13px/1 var(--mono);color:var(--ink);background:var(--plate);border:1px solid var(--rule);border-radius:3px;padding:8px 10px;cursor:pointer}
+button:hover{border-color:var(--arm)}
+button[aria-pressed="true"]{background:var(--arm);border-color:var(--arm);color:var(--plate)}
+button:focus-visible,.sq:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.readout div{background:var(--plate);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.readout b{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.readout span{font:500 20px/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.note{font-size:14px;color:var(--muted);max-width:none}
+.flag{border-left:3px solid var(--hot);padding:2px 0 2px 12px;font-size:14px}
+.flag.bad{border-color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.m{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl{background:var(--plate);border:1px solid var(--rule);border-radius:4px;overflow-x:auto}
+ol.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;counter-reset:s}
+ol.flow li{counter-increment:s;background:var(--plate);border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+ol.flow li::before{content:counter(s,decimal-leading-zero) "  " attr(data-who);font:500 11px/1.2 var(--mono);letter-spacing:.06em;color:var(--arm);text-transform:uppercase}
+ol.flow strong{font:600 16px/1.25 var(--display)}
+ul.open{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:75ch}
+/* svg text and strokes come from tokens */
+svg text{fill:var(--ink);font-family:var(--mono)}
+svg .mut{fill:var(--muted)}
+.sq{cursor:pointer}
+.sq:hover{opacity:.75}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Concept sheet · rev A · 2026-11-10</div>
+  <h1>Chess Robot Arm</h1>
+  <p class="lede">A 4-axis articulated arm with a two-finger gripper, stepper-driven through printed cycloidal reducers, playing a 40 × 40 cm board under a fixed overhead camera. Drawings below are to scale unless marked schematic; all dimensions in cm.</p>
+</header>
+
+<section id="reach">
+  <div class="sec-head">
+    <div class="eyebrow">Fig. 1 + 2 · layout and reach</div>
+    <h2>Where the arm sits and how it reaches each square</h2>
+    <p class="note">Click any square. The top view shows the base yaw; the side view solves the arm for that square with the gripper pointing straight down. The arm plays Black from behind rank 8; Ekke sits across at rank 1.</p>
+  </div>
+  <div class="controls" role="group" aria-label="Presets">
+    <button data-pre="d8">Nearest (d8)</button>
+    <button data-pre="a1">Far corner (a1)</button>
+    <button data-pre="e4">Centre (e4)</button>
+    <button data-pre="tray">Capture tray</button>
+    <span style="flex:1"></span>
+    <button id="liftBtn" aria-pressed="false">Show carry height (+10 cm)</button>
+  </div>
+  <div class="two">
+    <div class="plate"><svg id="top" viewBox="-40 -4 80 72" role="img" aria-label="Top view of board, arm base and reach"></svg><div class="cap">Fig. 1 · top view · 1 grid = 5 cm</div></div>
+    <div class="plate"><svg id="side" viewBox="-14 -66 78 70" role="img" aria-label="Side view of the arm reaching the selected square"></svg><div class="cap">Fig. 2 · side view in the arm's plane · solid = gripping, dashed = carry</div></div>
+  </div>
+  <div class="readout" id="ro"></div>
+  <div id="flags" style="display:flex;flex-direction:column;gap:8px"></div>
+</section>
+
+<section id="joints">
+  <div class="sec-head">
+    <div class="eyebrow">Joint schedule</div>
+    <h2>What moves, and what moves it</h2>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Joint</th><th>Motion</th><th>Range needed*</th><th>Drive</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="m">J1 base</td><td>Yaw about vertical axis</td><td class="m" id="r1">–</td><td>NEMA 17 + cycloidal, lazy-susan or large bearing carries arm weight</td><td>ratio open</td></tr>
+      <tr><td class="m">J2 shoulder</td><td>Pitch, lifts the whole arm</td><td class="m" id="r2">–</td><td>NEMA 17 + 20:1 cycloidal, 6806 output bearing, design torque 10 Nm</td><td>next to design</td></tr>
+      <tr><td class="m">J3 elbow</td><td>Pitch, folds forearm</td><td class="m" id="r3">–</td><td>NEMA 17 + cycloidal; could sit at the shoulder with a belt to cut forearm load</td><td>ratio open</td></tr>
+      <tr><td class="m">J4 wrist</td><td>Pitch, keeps gripper vertical</td><td class="m" id="r4">–</td><td>Small stepper (NEMA 14/17-pancake) + reducer</td><td>open</td></tr>
+      <tr><td class="m">J5 gripper</td><td>Two parallel fingers</td><td class="m">~0–4 cm open</td><td>Small stepper with lead screw or rack</td><td>open</td></tr>
+    </tbody></table></div>
+  <p class="note">* Computed over all 64 squares plus the capture tray, gripping and carry heights, using the assumptions in Fig. 2. Joint angles: J2 from horizontal, J3 relative to the upper arm, J4 relative to the forearm.</p>
+</section>
+
+<section id="drive">
+  <div class="sec-head">
+    <div class="eyebrow">Fig. 3 + 4 · shoulder actuator</div>
+    <h2>How the cycloidal drive gets 20:1</h2>
+    <p class="note">The motor spins an eccentric cam. The disc rolls around a ring of 21 fixed pins, and because it has only 20 lobes it walks back one lobe per motor turn: 20 motor turns = 1 output turn, in the opposite direction. Pins through holes in the disc pick off that slow rotation and drive the output flange, which runs in the 6806 bearing.</p>
+  </div>
+  <div class="two">
+    <div class="plate"><svg id="cyc" viewBox="-40 -40 80 80" role="img" aria-label="Animated cycloidal disc inside 21 ring pins"></svg><div class="cap" style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><span>Fig. 4 · front view, to scale (mm) · input <span id="inTurns">0.00</span> rev → output <span id="outTurns">0.000</span> rev</span><button id="cycBtn" aria-pressed="true">Pause</button></div></div>
+    <div class="plate"><svg viewBox="0 0 420 300" role="img" aria-label="Schematic cross-section of the shoulder drive">
+      <g stroke="var(--ink)" stroke-width="1.2" fill="none">
+        <line x1="10" y1="150" x2="410" y2="150" stroke="var(--muted)" stroke-dasharray="8 3 2 3"/>
+        <rect x="20" y="108" width="90" height="84" fill="var(--grid)"/>
+        <rect x="110" y="140" width="40" height="20" fill="var(--plate)"/>
+        <rect x="110" y="96" width="14" height="108" fill="var(--plate)"/>
+        <rect x="150" y="132" width="26" height="28" fill="var(--hot)" fill-opacity=".35"/>
+        <rect x="150" y="116" width="26" height="8" fill="var(--plate)"/>
+        <rect x="150" y="164" width="26" height="8" fill="var(--plate)"/>
+        <rect x="153" y="66" width="20" height="172" fill="var(--arm)" fill-opacity=".25"/>
+        <rect x="124" y="56" width="66" height="14" fill="var(--plate)"/><rect x="124" y="230" width="66" height="14" fill="var(--plate)"/>
+        <circle cx="163" cy="63" r="5" fill="var(--plate)"/><circle cx="163" cy="237" r="5" fill="var(--plate)"/>
+        <rect x="176" y="96" width="44" height="7" fill="var(--plate)"/><rect x="176" y="197" width="44" height="7" fill="var(--plate)"/>
+        <rect x="190" y="56" width="70" height="188" fill="var(--plate)"/>
+        <rect x="220" y="86" width="60" height="128" fill="var(--grid)"/>
+        <rect x="246" y="70" width="14" height="18" fill="var(--plate)"/><rect x="246" y="212" width="14" height="18" fill="var(--plate)"/>
+        <line x1="246" y1="70" x2="260" y2="88"/><line x1="260" y1="70" x2="246" y2="88"/><line x1="246" y1="212" x2="260" y2="230"/><line x1="260" y1="212" x2="246" y2="230"/>
+        <rect x="280" y="76" width="110" height="148" fill="var(--arm)" fill-opacity=".12" stroke-dasharray="4 3"/>
+      </g>
+      <g font-size="10.5">
+        <text x="24" y="102">NEMA 17</text><text x="24" y="210" class="mut">42.3 mm sq.</text>
+        <text x="30" y="90" class="mut">adapter plate</text>
+        <text x="128" y="276">eccentric cam</text><line x1="160" y1="266" x2="162" y2="168" stroke="var(--muted)"/>
+        <text x="132" y="40">ring pins ×21</text>
+        <text x="150" y="292" class="mut">cycloid disc, 20 lobes</text>
+        <text x="200" y="262" class="mut">housing</text>
+        <text x="226" y="154">output</text><text x="226" y="166">flange</text>
+        <text x="182" y="114" font-size="9" class="mut">pins</text>
+        <text x="262" y="66">6806</text><text x="262" y="78" class="mut" font-size="9">30×42×7</text>
+        <text x="300" y="144">upper arm</text><text x="300" y="158" class="mut">bolts here</text>
+      </g></svg><div class="cap">Fig. 3 · section, schematic (not to scale)</div></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Starting parameter</th><th>Value</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Ratio</td><td class="m">20 : 1</td><td>21 ring pins, 20-lobe disc (ratio = lobes)</td></tr>
+      <tr><td>Pin circle Ø / pin Ø</td><td class="m">60 / 5 mm</td><td>Fits a ~76 mm housing, close to the motor footprint; 5 mm dowels or steel rod</td></tr>
+      <tr><td>Eccentricity</td><td class="m">1.2 mm</td><td>Below pin-circle radius ÷ pin count (1.43) so the lobes don't undercut</td></tr>
+      <tr><td>Output pins</td><td class="m">6 × Ø5 in Ø7.4 holes</td><td>Hole = pin + 2 × eccentricity</td></tr>
+      <tr><td>Torque at motor for 10 Nm out</td><td class="m">≈ 0.6 Nm</td><td>10 ÷ 20 ÷ ~0.85 efficiency; a 0.45 Nm NEMA 17 falls short, so pick a 0.6+ Nm long-body motor or accept less margin</td></tr>
+    </tbody></table></div>
+  <p class="note">All of these become parameters in the CadQuery script; the values above are a first pass to check in CAD.</p>
+</section>
+
+<section id="system">
+  <div class="sec-head">
+    <div class="eyebrow">Fig. 5 · electronics</div>
+    <h2>Who talks to whom</h2>
+  </div>
+  <div class="plate"><svg viewBox="0 0 900 360" role="img" aria-label="System block diagram">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+    <g stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#ah)">
+      <path d="M150 70H268"/><path d="M150 180H268"/><path d="M480 130H578"/><path d="M700 130V198"/><path d="M640 300H580V160"/>
+      <path d="M150 290H190V215H268"/><path d="M110 300V250H360V202"/><path d="M100 320H640"/>
+    </g>
+    <g stroke="var(--ink)" stroke-width="1.4">
+      <rect x="20" y="40" width="130" height="60" rx="3" fill="var(--plate)"/>
+      <rect x="20" y="150" width="136" height="60" rx="3" fill="var(--plate)"/>
+      <rect x="270" y="50" width="210" height="150" rx="3" fill="var(--arm)" fill-opacity=".14"/>
+      <rect x="580" y="80" width="240" height="78" rx="3" fill="var(--hot)" fill-opacity=".16"/>
+      <rect x="580" y="200" width="240" height="60" rx="3" fill="var(--plate)"/>
+      <rect x="20" y="270" width="130" height="64" rx="3" fill="var(--plate)"/>
+      <rect x="640" y="286" width="180" height="48" rx="3" fill="var(--plate)"/>
+    </g>
+    <g font-size="14">
+      <text x="34" y="66">Webcam</text><text x="34" y="86" class="mut" font-size="11">overhead, 60 cm</text>
+      <text x="34" y="176" font-size="13">OLED + buttons</text><text x="34" y="196" class="mut" font-size="11">SSD1306 / SH1106</text>
+      <text x="286" y="78" font-weight="500">Raspberry Pi 5 · 4 GB</text>
+      <text x="286" y="104" class="mut" font-size="12">board vision (OpenCV)</text>
+      <text x="286" y="122" class="mut" font-size="12">Stockfish · game logic</text>
+      <text x="286" y="140" class="mut" font-size="12">IK → joint angles</text>
+      <text x="286" y="158" class="mut" font-size="12">menu: difficulty, puzzles</text>
+      <text x="596" y="106" font-weight="500">ESP32</text>
+      <text x="596" y="126" class="mut" font-size="12">step generation, accel ramps,</text>
+      <text x="596" y="144" class="mut" font-size="12">homing, e-stop</text>
+      <text x="596" y="226">5 × TMC2209 → steppers</text><text x="596" y="246" class="mut" font-size="12">J1 J2 J3 J4 + gripper</text>
+      <text x="34" y="296">PSU 24 V</text><text x="34" y="318" class="mut" font-size="11">motors direct</text>
+      <text x="656" y="314">homing switches</text>
+    </g>
+    <g font-size="11" class="mut">
+      <text x="168" y="62" class="mut">USB</text><text x="162" y="172" class="mut">I²C / GPIO</text>
+      <text x="494" y="122" class="mut">UART / USB</text><text x="710" y="186" class="mut">STEP/DIR</text>
+      <text x="196" y="240" class="mut">buck 5 V 5 A</text><text x="380" y="340" class="mut">24 V motor rail</text>
+    </g></svg><div class="cap">Fig. 5 · block diagram · Pi does the thinking in joint angles, ESP32 does the timing</div></div>
+</section>
+
+<section id="turn">
+  <div class="sec-head">
+    <div class="eyebrow">Sequence</div>
+    <h2>One turn, start to finish</h2>
+  </div>
+  <ol class="flow">
+    <li data-who="Ekke"><strong>Makes a move</strong>Then presses the "done" button, which avoids guessing when a hand has left the board.</li>
+    <li data-who="Pi · vision"><strong>Reads the board</strong>Compares the new frame with the last one, square by square, and finds which squares changed.</li>
+    <li data-who="Pi · logic"><strong>Checks the move</strong>Matches the changes against legal moves. If none fits, the OLED asks for a fix.</li>
+    <li data-who="Pi · Stockfish"><strong>Picks a reply</strong>At the difficulty set in the menu.</li>
+    <li data-who="Pi · planner"><strong>Plans the motion</strong>Capture first: carry the taken piece to the tray. Then the move itself, with castling and promotion as special cases.</li>
+    <li data-who="ESP32"><strong>Moves the arm</strong>Hover, descend, grip, lift to carry height, travel, descend, release.</li>
+    <li data-who="ESP32"><strong>Parks</strong>Back to a pose outside the camera's view, so the next photo is clean.</li>
+  </ol>
+</section>
+
+<section id="open">
+  <div class="sec-head">
+    <div class="eyebrow">Open questions</div>
+    <h2>What these drawings raise</h2>
+  </div>
+  <ul class="open">
+    <li><b>Elbow fold near the base.</b> Rank 8 squares are only ~13 cm from the shoulder, so the forearm folds back almost onto the upper arm (see Fig. 2 with d8). The elbow joint and link shapes must allow it without collision.</li>
+    <li><b>Far-corner margin.</b> a1/h1 at carry height need about 93% of full reach. Moving the base further back than 10 cm would eat that margin quickly.</li>
+    <li><b>Motor count.</b> The handover lists five NEMA 17s plus a gripper motor, but four arm joints only need four. Is the fifth a spare, or a wrist roll?</li>
+    <li><b>Homing.</b> Steppers need a reference at power-up. StallGuard is unreliable behind a high-ratio reducer, so plan a switch or hall sensor per joint.</li>
+    <li><b>Gripper length.</b> Assumed 12 cm from wrist axis to fingertips. A shorter gripper lowers the wrist and eases both cases above.</li>
+  </ul>
+</section>
+</div>
+
+<script>
+(()=>{
+const NS="http://www.w3.org/2000/svg";
+const L1=28,L2=28,HS=12,GRIP=12,GRIPZ=3,LIFT=10,OFF=10,SQ=5,REACH=L1+L2;
+const FILES="abcdefgh";
+const tray={x:28,y:6,name:"tray"};
+let sel="d8",lift=false;
+function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e}
+function sqPos(name){if(name==="tray")return{x:tray.x,y:tray.y};const f=FILES.indexOf(name[0]),r=+name[1];return{x:(3.5-f)*SQ,y:OFF+(8-r)*SQ+SQ/2}}
+// rank 1 is far from the arm (Ekke's side), rank 8 nearest; h-file on arm's left
+function ik(x,y,wz){const r=Math.hypot(x,y),yaw=Math.atan2(x,y),dz=wz-HS,d=Math.hypot(r,dz);
+  if(d>REACH-0.01)return{ok:false,r,yaw,d};
+  const a=Math.atan2(dz,r)+Math.acos((L1*L1+d*d-L2*L2)/(2*L1*d));
+  const ex=L1*Math.cos(a),ez=HS+L1*Math.sin(a),fore=Math.atan2(wz-ez,r-ex);
+  const deg=v=>v*180/Math.PI;
+  return{ok:true,r,yaw,d,ex,ez,wz,j1:deg(yaw),j2:deg(a),j3:deg(fore-a),j4:-90-deg(fore),fold:deg(Math.acos((L1*L1+L2*L2-d*d)/(2*L1*L2)))}}
+// ---- top view
+const top=document.getElementById("top");const Y=v=>62-v;
+function drawTop(){top.innerHTML="";
+  el("circle",{cx:0,cy:Y(0),r:REACH,fill:"var(--arm-soft)",stroke:"var(--arm)","stroke-width":.2,"stroke-dasharray":"1 .6"},top);
+  el("text",{x:-38,y:Y(40)+1,"font-size":1.7,class:"mut"},top,"full reach 56");
+  el("text",{x:-6,y:1.6,"font-size":1.8,class:"mut"},top,"Ekke sits here");
+  for(let r=1;r<=8;r++)for(let f=0;f<8;f++){const n=FILES[f]+r,p=sqPos(n);
+    const g=el("rect",{x:p.x-2.5,y:Y(p.y)-2.5,width:5,height:5,fill:(f+r)%2?"var(--sq-l)":"var(--sq-d)",class:"sq",tabindex:0,"data-sq":n,role:"button","aria-label":"square "+n},top);
+    if(n===sel)g.setAttribute("stroke","var(--hot)"),g.setAttribute("stroke-width",.5)}
+  el("rect",{x:-20,y:Y(50),width:40,height:40,fill:"none",stroke:"var(--ink)","stroke-width":.25},top);
+  for(let f=0;f<8;f++)el("text",{x:(3.5-f)*SQ-.5,y:Y(OFF)+2.4,"font-size":1.6,class:"mut"},top,FILES[f]);
+  for(let r=1;r<=8;r++)el("text",{x:21,y:Y(OFF+(8-r)*SQ+2.5)+.6,"font-size":1.6,class:"mut"},top,r);
+  el("rect",{x:tray.x-4,y:Y(tray.y)-5,width:8,height:10,rx:.6,fill:sel==="tray"?"var(--hot)":"var(--grid)","fill-opacity":sel==="tray"?.35:1,stroke:"var(--ink)","stroke-width":.2,class:"sq",tabindex:0,"data-sq":"tray",role:"button","aria-label":"capture tray"},top);
+  el("text",{x:tray.x-3.4,y:Y(tray.y)+7,"font-size":1.5},top,"capture");el("text",{x:tray.x-2.4,y:Y(tray.y)+8.8,"font-size":1.5},top,"tray");
+  el("circle",{cx:0,cy:Y(57.5),r:1.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},top);
+  el("text",{x:2,y:Y(57.5)+.6,"font-size":1.6},top,"camera pole");
+  el("rect",{x:-2,y:Y(30)-1.2,width:4,height:2.4,fill:"none",stroke:"var(--muted)","stroke-width":.25,"stroke-dasharray":".6 .4"},top);
+  el("line",{x1:0,y1:Y(57.5),x2:0,y2:Y(31.2),stroke:"var(--muted)","stroke-width":.25,"stroke-dasharray":".6 .4"},top);
+  const p=sqPos(sel),s=ik(p.x,p.y,GRIPZ+GRIP+(lift?LIFT:0));
+  if(s.ok){const ux=Math.sin(s.yaw),uy=Math.cos(s.yaw);
+    el("polyline",{points:`0,${Y(0)} ${s.ex*ux},${Y(s.ex*uy)} ${s.r*ux},${Y(s.r*uy)}`,fill:"none",stroke:"var(--arm)","stroke-width":1.6,"stroke-linejoin":"round","stroke-linecap":"round"},top);
+    el("circle",{cx:s.ex*ux,cy:Y(s.ex*uy),r:1,fill:"var(--plate)",stroke:"var(--arm)","stroke-width":.4},top)}
+  el("circle",{cx:0,cy:Y(0),r:4,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.3},top);
+  el("circle",{cx:0,cy:Y(0),r:1,fill:"var(--arm)"},top);
+  el("text",{x:-4,y:Y(0)+6.2,"font-size":1.6},top,"arm base");
+  el("line",{x1:-8,y1:Y(0),x2:-8,y2:Y(OFF),stroke:"var(--muted)","stroke-width":.2},top);
+  el("text",{x:-15,y:Y(5)+.6,"font-size":1.6,class:"mut"},top,"10 cm");
+  top.querySelectorAll(".sq").forEach(n=>{n.addEventListener("click",()=>pick(n.dataset.sq));n.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(n.dataset.sq)}})});
+}
+// ---- side view
+const side=document.getElementById("side");const Z=v=>-v;
+function armPath(s,dash){const g=el("g",{opacity:dash?.55:1},side);const w=dash?{"stroke-dasharray":"1.2 .8"}:{};
+  el("line",{x1:0,y1:Z(HS),x2:s.ex,y2:Z(s.ez),stroke:"var(--arm)","stroke-width":2.6,"stroke-linecap":"round",...w},g);
+  el("line",{x1:s.ex,y1:Z(s.ez),x2:s.r,y2:Z(s.wz),stroke:"var(--arm)","stroke-width":2,"stroke-linecap":"round",...w},g);
+  el("line",{x1:s.r,y1:Z(s.wz),x2:s.r,y2:Z(s.wz-GRIP+2),stroke:"var(--ink)","stroke-width":1.2,...w},g);
+  el("path",{d:`M${s.r-1.6} ${Z(s.wz-GRIP+2)}H${s.r+1.6}M${s.r-1.4} ${Z(s.wz-GRIP+2)}V${Z(s.wz-GRIP)}M${s.r+1.4} ${Z(s.wz-GRIP+2)}V${Z(s.wz-GRIP)}`,stroke:"var(--ink)","stroke-width":.5,fill:"none"},g);
+  if(!dash){el("rect",{x:s.ex-2.1,y:Z(s.ez)-2.1,width:4.2,height:4.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
+    el("circle",{cx:s.ex,cy:Z(s.ez),r:.8,fill:"var(--arm)"},g);
+    el("rect",{x:s.r-1.6,y:Z(s.wz)-1.6,width:3.2,height:3.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
+    el("circle",{cx:s.r,cy:Z(s.wz),r:.6,fill:"var(--arm)"},g)}}
+function drawSide(){side.innerHTML="";
+  const p=sqPos(sel),yaw=Math.atan2(p.x,p.y);
+  el("line",{x1:-14,y1:0,x2:64,y2:0,stroke:"var(--ink)","stroke-width":.3},side);
+  // board extent along this heading (straight-line distance where heading enters/leaves the 40x40 board)
+  const ux=Math.sin(yaw),uy=Math.cos(yaw);let a=0,b=100;
+  [[ -20,20,ux],[OFF,OFF+40,uy]].forEach(([lo,hi,u])=>{if(Math.abs(u)<1e-9)return;let t1=lo/u,t2=hi/u;if(t1>t2)[t1,t2]=[t2,t1];a=Math.max(a,t1);b=Math.min(b,t2)});
+  if(b>a){el("rect",{x:a,y:-1,width:b-a,height:1,fill:"var(--sq-d)"},side);el("text",{x:a,y:2.8,"font-size":1.6,class:"mut"},side,"board along this heading")}
+  if(sel==="tray")el("rect",{x:p.x?Math.hypot(p.x,p.y)-4:0,y:-1.5,width:8,height:1.5,fill:"var(--grid)",stroke:"var(--ink)","stroke-width":.2},side);
+  // camera
+  const rc=30*uy;el("rect",{x:rc-2,y:Z(61.5),width:4,height:3,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},side);
+  el("text",{x:rc+3,y:Z(60),"font-size":1.6,class:"mut"},side,"camera 60");
+  el("line",{x1:rc,y1:Z(58.5),x2:rc,y2:Z(52),stroke:"var(--muted)","stroke-width":.25,"stroke-dasharray":".6 .4"},side);
+  // reach envelope
+  el("circle",{cx:0,cy:Z(HS),r:REACH,fill:"none",stroke:"var(--arm)","stroke-width":.2,"stroke-dasharray":"1 .6"},side);
+  // base
+  el("rect",{x:-5,y:Z(HS-1),width:10,height:HS-1,fill:"var(--grid)",stroke:"var(--ink)","stroke-width":.25},side);
+  el("rect",{x:-7,y:Z(1.5),width:14,height:1.5,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},side);
+  el("text",{x:-12.5,y:Z(5),"font-size":1.4,class:"mut"},side,"Pi, ESP32,");el("text",{x:-12.5,y:Z(3.3),"font-size":1.4,class:"mut"},side,"PSU in base");
+  const r=Math.hypot(p.x,p.y),pz=sel==="tray"?0:0;
+  const g=ik(p.x,p.y,GRIPZ+GRIP),c=ik(p.x,p.y,GRIPZ+GRIP+LIFT);
+  if(lift&&c.ok){armPath(g,true);armPath(c,false);el("rect",{x:r-1.1,y:Z(LIFT+5),width:2.2,height:5,rx:.8,fill:"var(--hot)"},side)}
+  else{if(c.ok&&lift)armPath(c,true);if(g.ok)armPath(g,false);el("rect",{x:r-1.1,y:Z(pz+5),width:2.2,height:5,rx:.8,fill:"var(--hot)"},side)}
+  el("rect",{x:-2.1,y:Z(HS)-2.1,width:4.2,height:4.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},side);
+  el("circle",{cx:0,cy:Z(HS),r:.9,fill:"var(--arm)"},side);
+  const s=lift?c:g;
+  if(s.ok){el("text",{x:s.ex+2.8,y:Z(s.ez)-1,"font-size":1.6},side,"elbow");el("text",{x:3,y:Z(HS)+3.6,"font-size":1.6},side,"shoulder");el("text",{x:s.r+2.2,y:Z(s.wz)+.5,"font-size":1.6},side,"wrist")}
+  el("line",{x1:0,y1:2.2,x2:r,y2:2.2,stroke:"var(--muted)","stroke-width":.2},side);
+  el("text",{x:r/2-3,y:3.9,"font-size":1.6},side,r.toFixed(1)+" cm");
+}
+function readout(){const p=sqPos(sel),s=ik(p.x,p.y,GRIPZ+GRIP+(lift?LIFT:0));const ro=document.getElementById("ro");
+  const f=v=>(v>=0?"+":"")+v.toFixed(0)+"°";
+  const items=s.ok?[["Target",sel==="tray"?"tray":sel],["Distance",s.r.toFixed(1)+" cm"],["J1 base",f(s.j1)],["J2 shoulder",f(s.j2)],["J3 elbow",f(s.j3)],["J4 wrist",f(s.j4)],["Extension",(100*s.d/REACH).toFixed(0)+"%"]]:[["Target",sel],["Status","out of reach"]];
+  ro.innerHTML=items.map(([k,v])=>`<div><b>${k}</b><span>${v}</span></div>`).join("");
+  const fl=document.getElementById("flags");fl.innerHTML="";
+  if(s.ok&&s.fold<40)fl.innerHTML+=`<p class="flag">Tight fold: the forearm sits only ${s.fold.toFixed(0)}° from the upper arm here. This is the hard case for the elbow, not the far corner.</p>`;
+  if(s.ok&&s.d/REACH>.9)fl.innerHTML+=`<p class="flag">Near full stretch (${(100*s.d/REACH).toFixed(0)}%). This is also where shoulder torque peaks, roughly the 6 Nm case from the handover.</p>`;
+  if(!s.ok)fl.innerHTML+=`<p class="flag bad">Out of reach with the current link lengths.</p>`;
+  document.querySelectorAll("[data-pre]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pre===sel))}
+function ranges(){const acc={j1:[1e9,-1e9],j2:[1e9,-1e9],j3:[1e9,-1e9],j4:[1e9,-1e9]};const names=["tray"];for(const f of FILES)for(let r=1;r<=8;r++)names.push(f+r);
+  for(const n of names)for(const h of [0,LIFT]){const p=sqPos(n),s=ik(p.x,p.y,GRIPZ+GRIP+h);if(!s.ok)continue;for(const k in acc){acc[k][0]=Math.min(acc[k][0],s[k]);acc[k][1]=Math.max(acc[k][1],s[k])}}
+  const f=v=>(v>=0?"+":"−")+Math.abs(v).toFixed(0)+"°";["j1","j2","j3","j4"].forEach((k,i)=>document.getElementById("r"+(i+1)).textContent=`${f(acc[k][0])} … ${f(acc[k][1])}`)}
+function pick(n){sel=n;drawTop();drawSide();readout();const t=top.querySelector(`[data-sq="${n}"]`);}
+document.querySelectorAll("[data-pre]").forEach(b=>b.addEventListener("click",()=>pick(b.dataset.pre)));
+const lb=document.getElementById("liftBtn");lb.addEventListener("click",()=>{lift=!lift;lb.setAttribute("aria-pressed",lift);drawTop();drawSide();readout()});
+pick(sel);ranges();
+// ---- cycloid
+const N=21,R=30,Rr=2.5,E=1.2,svg=document.getElementById("cyc");
+let pts=[];for(let i=0;i<720;i++){const t=2*Math.PI*i/720,psi=Math.atan2(Math.sin((1-N)*t),R/(E*N)-Math.cos((1-N)*t));pts.push([R*Math.cos(t)-Rr*Math.cos(t+psi)-E*Math.cos(N*t),-R*Math.sin(t)+Rr*Math.sin(t+psi)+E*Math.sin(N*t)])}
+el("circle",{cx:0,cy:0,r:38,fill:"var(--grid)",stroke:"var(--ink)","stroke-width":.3},svg);
+for(let k=0;k<N;k++){const a=2*Math.PI*k/N;el("circle",{cx:R*Math.cos(a),cy:R*Math.sin(a),r:Rr,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.3},svg)}
+const disc=el("g",{},svg);
+el("path",{d:"M"+pts.map(p=>p[0].toFixed(2)+" "+p[1].toFixed(2)).join("L")+"Z",fill:"var(--arm)","fill-opacity":.28,stroke:"var(--arm)","stroke-width":.4},disc);
+el("circle",{cx:0,cy:0,r:12,fill:"var(--plate)",stroke:"var(--arm)","stroke-width":.4},disc);
+for(let k=0;k<6;k++){const a=2*Math.PI*k/6;el("circle",{cx:19*Math.cos(a),cy:19*Math.sin(a),r:3.7,fill:"var(--plate)",stroke:"var(--arm)","stroke-width":.3},disc)}
+el("line",{x1:0,y1:0,x2:0,y2:-9,stroke:"var(--arm)","stroke-width":.6},disc);
+const outp=el("g",{},svg);
+for(let k=0;k<6;k++){const a=2*Math.PI*k/6;el("circle",{cx:19*Math.cos(a),cy:19*Math.sin(a),r:2.5,fill:"var(--hot)"},outp)}
+const cam=el("g",{},svg);el("circle",{cx:0,cy:0,r:4,fill:"var(--hot)","fill-opacity":.5,stroke:"var(--ink)","stroke-width":.3},cam);el("circle",{cx:0,cy:0,r:.8,fill:"var(--ink)"},svg);
+const inArrow=el("line",{x1:0,y1:0,x2:0,y2:-4,stroke:"var(--ink)","stroke-width":.5},svg);
+let th=0,run=!window.matchMedia("(prefers-reduced-motion: reduce)").matches,last=null;
+const it=document.getElementById("inTurns"),ot=document.getElementById("outTurns"),cb=document.getElementById("cycBtn");
+function frame(t){const cx=E*Math.cos(th),cy=E*Math.sin(th),rot=-th/(N-1)*180/Math.PI;
+  disc.setAttribute("transform",`translate(${cx} ${cy}) rotate(${rot})`);outp.setAttribute("transform",`rotate(${rot})`);
+  cam.setAttribute("transform",`translate(${cx} ${cy})`);inArrow.setAttribute("transform",`rotate(${th*180/Math.PI+90})`);
+  it.textContent=(th/2/Math.PI).toFixed(2);ot.textContent=(-th/2/Math.PI/(N-1)).toFixed(3)}
+function loop(t){if(last!=null&&run)th+=(t-last)/1000*2.2;last=t;frame();requestAnimationFrame(loop)}
+cb.textContent=run?"Pause":"Play";cb.setAttribute("aria-pressed",run);
+cb.addEventListener("click",()=>{run=!run;cb.textContent=run?"Pause":"Play";cb.setAttribute("aria-pressed",run)});
+frame();requestAnimationFrame(loop);
+})();
+</script>
