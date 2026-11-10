@@ -11,7 +11,7 @@ import cadquery as cq
 
 import cycloidal as cy
 from common import as5600_board, belt_solid, motor_holes, motor_pulley_solid, motor_solid, polar, sensor_bridge
-from hardware import MOTOR_PULLEY, MOTORS, pick_belt
+from hardware import MOTOR_PULLEY, MOTORS, pick_belt, stack_bolt
 from layout import motor_pulley_base
 
 
@@ -73,7 +73,8 @@ class JointKit:
         z0 = -t - depth_extra
         cut = cq.Workplane("XY").workplane(offset=z0).circle(D.hex_af / cos(pi / 6) / 2 + 1.0).extrude(t + depth_extra)
         cut = cut.union(cq.Workplane("XY").workplane(offset=z0).pushPoints(bolts).circle(D.bolt_d / 2).extrude(t + depth_extra))
-        cut = cut.union(cq.Workplane("XY").workplane(offset=z0).pushPoints(bolts).polygon(6, 6.4).extrude(2.8))   # M3 nuts
+        self.bolt_len, pocket = stack_bolt(D.z_cap_top, t)
+        cut = cut.union(cq.Workplane("XY").workplane(offset=z0).pushPoints(bolts).polygon(6, 6.4).extrude(pocket + depth_extra))  # M3 nuts
         posts = [(self.span * cos(a + pi / 2), self.span * sin(a + pi / 2)),
                  (self.span * cos(a - pi / 2), self.span * sin(a - pi / 2))]
         cut = cut.union(cq.Workplane("XY").workplane(offset=z0).pushPoints(posts).circle(1.25).extrude(t + depth_extra))

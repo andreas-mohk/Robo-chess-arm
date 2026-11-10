@@ -15,6 +15,7 @@ import cadquery as cq
 
 import assembly as A
 import base
+import bom as bom_mod
 import camera
 import kinematics as K
 import links
@@ -289,63 +290,6 @@ def bed_check(parts):
 
 
 # ------------------------------------------------------------------ BOM
-def bom():
-    rows = []
-
-    def add(item, qty, each, note=""):
-        rows.append((item, qty, each, note))
-    for j, D in (("J1", D1), ("J2", D2), ("J3", D3), ("J4", D4)):
-        jc = C.joints[j]
-        add(f"{j} motor {jc.motor} ({MOTORS[jc.motor].name})", 1, MOTORS[jc.motor].price)
-        add(f"{j} dowel pins {D.ring_pin_d:g} x {D.ring_pin_len:g} (ring)", D.n_ring_pins, DOWEL_PRICE[int(D.ring_pin_d)])
-        add(f"{j} dowel pins {D.out_pin_d:g} x {D.out_pin_len:g} (output)", D.out_pins, DOWEL_PRICE[int(D.out_pin_d)])
-        add(f"{j} bearing {D.cam_brg} (eccentrics)", 2, BEARINGS[D.cam_brg].price)
-        add(f"{j} bearing {D.journal_brg} (input shaft)", 2, BEARINGS[D.journal_brg].price)
-        add(f"{j} bearing {D.out_brg} (output)", 1, BEARINGS[D.out_brg].price)
-        bolt_len = 5 * ceil((D.z_cap_top + (C.base_top_t if j == "J1" else C.plate_t)) / 5)
-        add(f"{j} M3 x {bolt_len} bolts + nuts (stack)", D.bolt_n, 0.08)
-        add(f"{j} M3 screws (output clamp)", D.clamp_bolt_n, 0.05)
-        add(f"{j} 20T GT2 pulley, 5 mm bore", 1, MOTOR_PULLEY["price"])
-        add(f"{j} AS5600 board + 6x2.5 diametric magnet", 1, AS5600["price"])
-    loops = {"J1": base.K1, "J2": links.K2, "J3": links.K3, "J4": links.K4}
-    for j, k in loops.items():
-        add(f"{j} GT2 6 mm closed belt, {k.loop} mm", 1, 1.5 if k.loop < 400 else 2.5)
-    add(f"J5 roll motor {C.roll_motor}", 1, MOTORS[C.roll_motor].price)
-    add(f"J6 gripper motor {C.gripper_motor}", 1, GEARED[C.gripper_motor].price, "cut the middle trace to run it bipolar")
-    add(f"Aluminium tube {C.tube}, 2 x {C.L1 - 2 * links.TUBE_START:.0f} mm", 1, AL_TUBE[C.tube]["price_per_m"])
-    add(f"Steel balls {C.ball_d:g} mm (race)", base.balls()[1], STEEL_BALL_PRICE)
-    add(f"Steel rod {wrist.ROD_D:g} mm, 2 x {2 * (wrist.U_IN + wrist.WALL_T):.0f} mm (gripper)", 1, 2.5)
-    add("LM6UU linear bushing (gripper jaws)", 4, LM6UU["price"])
-    add("6804 bearing (wrist roll)", 1, BEARINGS["6804"].price)
-    pole_len = camera.Z_POLE_TOP - camera.Z_POLE_BOT + camera.BOOM_X1 - camera.BOOM_X0
-    add(f"Aluminium tube {C.pole_tube}, {camera.Z_POLE_TOP - camera.Z_POLE_BOT:.0f} + {camera.BOOM_X1 - camera.BOOM_X0:.0f} mm (camera pole)",
-        1, AL_TUBE[C.pole_tube]["price_per_m"] * pole_len / 1000 + 1.0)
-    add("1/4\"-20 x 10 screw (webcam) + M4 bolts (pole)", 1, 1.5)
-    add("M4 bolts + nuts (tube sockets, tower foot, baseplate)", 16, 0.10)
-    add("M3 / M2.5 / M2 assorted screws, grub screws", 1, 6.0)
-    add(COMPUTERS[C.computer]["name"], 1, COMPUTERS[C.computer]["price"])
-    add("ESP32 dev board", 1, 6.0)
-    add("TMC2209 driver", 6, 4.5)
-    add("Buck converter 24 V -> 5 V 5 A", 1, 6.0)
-    add(f"OLED {C.oled}", 1, 6.0)
-    add("Tactile buttons 12 mm + caps", C.buttons, 0.3)
-    add("TCA9548A I2C multiplexer (AS5600s share one address)", 1, 2.0)
-    add("24 V 5 A external power brick + panel jack", 1, 22.0)
-    add("Mini limit switch (gripper home)", 1, 0.5)
-    add("Wire, connectors, perfboard", 1, 15.0)
-    add("PETG filament (~1.5 kg)", 1, 30.0)
-    total = sum(q * e for _, q, e, _ in rows)
-    return rows, total
-
-
-def write_bom(rows, total):
-    lines = ["| Item | Qty | Each (EUR) | Total (EUR) | Note |", "|---|---|---|---|---|"]
-    for item, q, e, note in rows:
-        lines.append(f"| {item} | {q} | {e:.2f} | {q * e:.2f} | {note} |")
-    lines.append(f"| **Total** | | | **{total:.0f}** | budget {300} |")
-    (OUT / "bom.md").write_text("\n".join(lines) + "\n")
-
-
 # ------------------------------------------------------------------ exports
 COLORS = {"printed": (0.07, 0.45, 0.42), "drive": (0.80, 0.55, 0.15), "hardware": (0.35, 0.37, 0.40)}
 
@@ -471,13 +415,14 @@ def main():
     if not QUICK:
         log("\n## Collision sweep (arm groups, table, board, neighbouring pieces)")
         collision_sweep()
-    rows, total = bom()
-    log(f"\n## Cost\n  estimated total EUR {total:.0f} (budget EUR 300), see out/bom.md")
+    rows = bom_mod.rows()
+    total = bom_mod.total(rows)
+    log(f"\n## Cost\n  estimated total EUR {total:.0f} incl. spares and packs (budget EUR 300), see out/bom_sourcing.csv")
     if total > 300:
         notes.append(f"estimated cost EUR {total:.0f} is over the EUR 300 budget")
     if EXPORT:
         log("\n## Export")
-        write_bom(rows, total)
+        bom_mod.write(rows)
         exports()
     log("\n## Result")
     log("  problems: " + ("; ".join(problems) if problems else "none"))

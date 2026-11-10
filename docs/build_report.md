@@ -36,7 +36,7 @@
 ## Torque (gravity over every target pose, gripper vertical)
   link masses: upper 0.58 kg, forearm 0.47 kg, wrist+gripper 0.42 kg, payload 30 g
   joint   gravity(worst)  x1.3 accel   capacity   margin
-  J2       4.13 Nm         5.38 Nm     9.36 Nm    1.7x
+  J2       4.13 Nm         5.37 Nm     9.36 Nm    1.7x
   J3       1.44 Nm         1.88 Nm     5.04 Nm    2.7x
   J4       0.00 Nm         0.00 Nm     3.78 Nm   1058.6x
   J1 capacity 2.34 Nm (no gravity load; enough for ~16 rad/s^2 on a ~0.15 kg m^2 arm)
@@ -62,11 +62,11 @@
   inside the base: clear
 
 ## Cost
-  estimated total EUR 284 (budget EUR 300), see out/bom.md
+  estimated total EUR 338 incl. spares and packs (budget EUR 300), see out/bom_sourcing.csv
 
 ## Export
   exported 63 printed parts (STL + STEP), assembly STEP, 7 GLB groups -> /home/user/Robo-chess-arm/cad/out
 
 ## Result
   problems: none
-  notes: none
+  notes: estimated cost EUR 338 is over the EUR 300 budget

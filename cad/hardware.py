@@ -134,6 +134,25 @@ def pick_belt(c_nominal, t1, t2, slack=(-3.0, 6.0)):
     raise ValueError("belt longer than any stocked loop")
 
 
+# --- fasteners
+SCREW_LENGTHS = [4, 6, 8, 10, 12, 16, 20, 25, 30, 35, 40, 45, 50]   # commonly stocked metric lengths
+M3_NUT_H = 2.4
+
+
+def stack_bolt(stack, carrier_t, nut_h=M3_NUT_H):
+    """Longest standard bolt whose end lands inside the carrier with room for a nut.
+    stack: head face to carrier face. Returns (length, nut pocket depth from the carrier's far face)."""
+    for L in reversed(SCREW_LENGTHS):
+        into = L - stack
+        if nut_h + 0.6 <= into <= carrier_t:
+            return L, carrier_t - (into - nut_h)
+    raise ValueError(f"no standard bolt fits a {stack:.1f} mm stack on a {carrier_t} mm plate")
+
+
+def std_len(minimum):
+    return next(L for L in SCREW_LENGTHS if L >= minimum)
+
+
 # --- sensors and electronics (verify against the boards you buy)
 AS5600 = dict(board_w=23.0, board_h=23.0, board_t=1.6, chip_from_back=2.6, hole_pitch=17.0, hole_d=2.2,
               magnet_d=6.0, magnet_h=2.5, air_gap=1.5, price=2.5)

@@ -4,7 +4,7 @@ From-scratch articulated arm that plays chess against Ekke on a physical board.
 
 - **3D model:** [`docs/arm3d.html`](docs/arm3d.html) (pose joints, jump to squares, play a move)
 - **CAD sources:** [`cad/`](cad/) (see [`cad/README.md`](cad/README.md) for how to change parameters)
-- **Last build report:** [`docs/build_report.md`](docs/build_report.md) · **Bill of materials:** [`docs/bom.md`](docs/bom.md)
+- **Last build report:** [`docs/build_report.md`](docs/build_report.md) · **Bill of materials (for sourcing):** [`docs/bom_sourcing.csv`](docs/bom_sourcing.csv) / [`.md`](docs/bom_sourcing.md)
 - Concept sheet (rev B, partly superseded): [`docs/diagrams.html`](docs/diagrams.html)
 
 ## Fixed decisions
@@ -46,7 +46,7 @@ A printed rod on the output flange runs back through the hollow input shaft and 
 | Belts | J1 180, J2 232, J3 800, J4 800 mm closed GT2-6 |
 | Printed parts | 63, all fit a 220 × 220 × 250 bed |
 | Camera | C920 at 600 mm covers 847 × 476 mm; the board + 20 mm margin needs 40° × 40° (has 70° × 43°) |
-| Estimated cost | ≈ €284 (see bom.md) |
+| Estimated cost | ≈ €338 including spares, pack sizes, wiring, baseplate and 2 kg filament (see bom_sourcing.csv) |
 
 ## Checks the build runs
 Drive parameters (walls, undercut, pin lengths), cycloid meshing at 6 angles per drive, reach for every target, IK vs the assembled model, gravity torque per joint, print-bed fit, gripper internals over its opening range, and the camera's field of view. Then a collision sweep: 13 poses including park, against the table, the board, the camera pole and worst-case tall pieces on neighbouring squares. The build also checks that the parked arm is out of the camera's view, and that the parts inside the base don't overlap. Current status: **all clear**.
@@ -71,6 +71,7 @@ Drive parameters (walls, undercut, pin lengths), cycloid meshing at 6 angles per
 - 2026-11-10: Project started. Concept diagrams.
 - 2026-11-10: Rev B decisions. First shoulder drive model.
 - 2026-11-10: Rev C: complete parametric arm in CadQuery (base, turntable, tower, links, 4 drives, wrist, gripper), build checks, BOM, 3D viewer.
+- 2026-11-10: Sourcing BOM (`cad/bom.py`). The drive stack bolts now use standard lengths (M3×40 on J1–J3, M3×35 on J4), with nut pockets sized to suit.
 - 2026-11-10: Rev D: stronger gripper, roll bearing, camera pole with field-of-view check, Pi 4 1 GB, park pose moved beside the base and out of the camera's view.
 
 ## Next step
