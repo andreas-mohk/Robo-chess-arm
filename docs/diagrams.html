@@ -68,6 +68,7 @@ svg .mut{fill:var(--muted)}
 <div class="wrap">
 <header>
   <div class="eyebrow">Concept sheet · rev B · 2026-11-10</div>
+  <p class="flag">Rev C (the full CAD) changed some details here: every joint is now belt-driven (2:1 into the 20:1 cycloid), the shoulder sits at 23 cm, the tool is 15.4 cm long, and there is no spring counterbalance. The 3D model and PROJECT.md are the current reference; this sheet ignores the 5.5 cm sideways offset of the gripper.</p>
   <h1>Chess Robot Arm</h1>
   <p class="lede">A 5-axis articulated arm (base, shoulder, elbow, wrist pitch, wrist roll) with a two-finger gripper, stepper-driven through printed cycloidal reducers, playing a 40 × 40 cm board under a fixed overhead camera. Drawings below are to scale unless marked schematic; all dimensions in cm.</p>
 </header>
@@ -240,7 +241,7 @@ svg .mut{fill:var(--muted)}
 <script>
 (()=>{
 const NS="http://www.w3.org/2000/svg";
-const L1=28,L2=28,HS=18,GRIP=15,GRIPZ=3,LIFT=10,OFF=10,SQ=5,REACH=L1+L2;
+const L1=28,L2=28,HS=23,GRIP=15.4,GRIPZ=4.5,LIFT=10,OFF=10,SQ=5,REACH=L1+L2;
 const FILES="abcdefgh";
 const tray={x:28,y:6,name:"tray"};
 let sel="d8",lift=false;

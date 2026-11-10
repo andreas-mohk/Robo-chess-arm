@@ -1,62 +1,74 @@
 # Chess Robot Arm
 
 From-scratch articulated arm that plays chess against Ekke on a physical board.
-Concept drawings: [`docs/diagrams.html`](docs/diagrams.html) (open in a browser; interactive reach/IK view).
+
+- **3D model:** [`docs/arm3d.html`](docs/arm3d.html) (pose joints, jump to squares, play a move)
+- **CAD sources:** [`cad/`](cad/) (see [`cad/README.md`](cad/README.md) for how to change parameters)
+- **Last build report:** [`docs/build_report.md`](docs/build_report.md) · **Bill of materials:** [`docs/bom.md`](docs/bom.md)
+- Concept sheet (rev B, partly superseded): [`docs/diagrams.html`](docs/diagrams.html)
 
 ## Fixed decisions
 - **Arm:** base yaw (J1), shoulder (J2), elbow (J3), wrist pitch (J4), wrist roll (J5), two-finger gripper (J6). 6 motors, 6 × TMC2209.
-- **Actuators:** steppers on every joint, self-built printed cycloidal reducers. No hobby servos.
-- **Board:** 40 × 40 cm, 5 cm squares. Arm base 10 cm from the midpoint of one edge (arm plays Black, behind rank 8).
+- **Actuators:** steppers everywhere, printed two-disc cycloidal reducers on J1–J4. No hobby servos.
+- **Board:** 40 × 40 cm, 5 cm squares. Yaw axis 10 cm from the midpoint of one edge (arm plays Black, behind rank 8).
 - **Vision:** fixed webcam, straight down from ~60 cm.
-- **Compute:** Raspberry Pi 5 4 GB (vision, Stockfish, game logic, OLED menu) + ESP32 (real-time steps), UART/USB link.
-- **CAD:** CadQuery, parameterised; export STLs at the end.
+- **Compute:** Raspberry Pi 5 4 GB (vision, Stockfish, game logic, OLED menu) + ESP32 (step generation), UART/USB.
+- **CAD:** CadQuery, fully parameterised (`cad/config.py`, `cad/hardware.py`); STLs exported by `cad/build.py`.
 - **Budget:** ~€300 excluding webcam and chess set.
 
-## Geometry (working assumptions)
+## Architecture (rev C)
+Every joint J1–J4 uses the same module:
+**motor → 20T/40T GT2 belt (2:1) → hollow input shaft with two eccentrics → two 20-lobe discs in 21 ring pins (20:1) → output flange in its output bearing → next link.**
+A printed rod on the output flange runs back through the hollow input shaft and carries a magnet, so an **AS5600 behind the pulley reads the output angle directly** (absolute position at power-up, catches missed steps).
+
+- The drive's back cover bolts straight onto a carrier plate; pulley, belt and sensor sit on the far side of the plate.
+- **Motors are moved off the joints:** J2's motor sits on the tower, J3's motor rides on the upper arm behind the shoulder (as a counterweight), and J4's motor rides on the forearm behind the elbow. J1's motor hangs below the base top. The wrist only carries the roll motor and the gripper.
+- **Links:** 15 × 15 × 1.5 aluminium tube with printed end fittings, so no part is longer than the print bed.
+- **Offset elbow:** the forearm runs beside the upper arm, so the elbow can fold to 25° for the squares nearest the base.
+- **Base:** printed box with the Pi, the ESP32 board and the buck converter inside. The OLED and 3 buttons face the board. A 6 mm ball race carries the turntable. Power comes from an external 24 V brick, so there is no mains wiring inside.
+- **Wrist:** pancake NEMA 17 roll (direct drive) and a rack-and-pinion parallel gripper on 4 mm rods, driven by a 28BYJ-48. The jaws close along a board diagonal, where there is the most room between pieces.
+- **J4 drive** is a smaller version (15:1, Ø68, 6804 output).
+
+## Key numbers (from the last build)
 | Item | Value |
 |---|---|
-| Upper arm / forearm | 28 / 28 cm (reach 56 cm) |
-| Shoulder axis height | 18 cm |
-| Wrist axis → fingertips | 15 cm (incl. roll joint) |
-| Grip height / carry lift | 3 cm / +10 cm |
-| Nearest square (d8/e8) | 12.7 cm, elbow folds to ~26° |
-| Far corner (a1/h1) | 50.6 cm, 90 % extension (92 % at carry height) |
-| Shoulder torque | ~7 Nm stretched incl. roll wrist → design for 10 Nm |
+| Upper arm / forearm | 28 / 28 cm |
+| Shoulder axis height | 23 cm above the table |
+| J4 axis → fingertips | 15.4 cm |
+| Gripper offset from the yaw axis (sideways) | 5.5 cm (handled by the IK) |
+| Reach | all 64 squares + capture tray, max 91 % extension, tightest elbow fold 25° |
+| Joint ranges | J1 −67…+69°, J2 +22…+107°, J3 −155…−50°, J4 −73…+3°, J5 −68…+85° |
+| Total ratio J1–J3 / J4 | 40:1 / 30:1 |
+| Gravity torque ×1.3 vs capacity | J2 4.5 / 9.4 Nm (2.1×), J3 1.4 / 5.0 Nm (3.7×) |
+| Link masses | upper 0.58 kg, forearm 0.47 kg, wrist + gripper 0.27 kg |
+| Belts | J1 180, J2 232, J3 800, J4 800 mm closed GT2-6 |
+| Printed parts | 59, all fit a 220 × 220 × 250 bed |
+| Estimated cost | ≈ €302 (see bom.md) |
 
-Joint ranges needed over all squares + capture tray (from diagrams.html):
-J1 −54…+78°, J2 +25…+111°, J3 −154…−46°, J4 −78…−13°, J5 ±90°.
+## Checks the build runs
+Drive parameters (walls, undercut, pin lengths), cycloid meshing at 6 angles per drive, reach for every target, IK vs the assembled model, gravity torque per joint, print-bed fit, and a collision sweep: 13 poses including park, against the table, the board and worst-case tall pieces on neighbouring squares. The parts inside the base are checked too. Current status: **all clear**.
 
-## Shoulder drive (J2), `cad/shoulder_drive.py`
-NEMA 17 → twin eccentric cam → two 20-lobe cycloid discs (180° apart, for balance) in 21 ring pins → 6 output pins → output flange in a 6806 → clamp, upper arm bolts to the clamp.
-Run `python3 cad/shoulder_drive.py`: checks disc/pin interference at 6 input angles, exports STEP + STL per part to `cad/out/` (not committed).
-Key parameters: pin circle Ø60, pins Ø5, eccentricity 1.2, profile clearance 0.15, discs 2 × 6 mm, output pins on Ø38, housing Ø84, stack 37 mm.
-Printed parts: motor_plate, housing_ring, cycloid_disc_a, cycloid_disc_b, cam, output_flange, output_cap, output_clamp.
+## Design decisions log
+- **rev B:** wrist roll as 5th motor, offset elbow, elbow motor behind the shoulder, AS5600 per joint.
+- **rev C (full CAD):**
+  - Belt input on every drive. This makes the sensor-through-hollow-shaft possible and doubles the ratio, so standard motors are enough. No spring counterbalance and no long-body motor needed (J2 margin 2.1× with a 48 mm motor).
+  - Shoulder raised to 23 cm. The J3 tail motor needs clearance over the turntable, and the board's thickness lifts the grip height anyway.
+  - Tubes are 15 mm, not 20 mm, so the two links clear each other at the tight elbow fold.
+  - Gripper hub lengthened so the gripper clears the J4 drive.
+  - J3/J4 motor tails are 90 mm because they snap to a stocked 800 mm belt.
 
-Hardware per shoulder drive:
-| Qty | Part |
-|---|---|
-| 21 | Ø5 × 20 dowel pins (ring) |
-| 6 | Ø5 × 18 dowel pins (output) |
-| 2 | 6802 bearing (15 × 24 × 5) |
-| 1 | 6806 bearing (30 × 42 × 7) |
-| 6 | M3 × 35 + nut (stack) |
-| 4 | M3 × 8 (motor) |
-| 4 | M3 × 10 (clamp) |
-| 1 | NEMA 17 long-body, ~0.65 Nm, 5 mm D-shaft |
-
-Not yet in the model: shaft support at the output end, mount to the base yoke, spring counterbalance anchor, AS5600 magnet pocket.
-
-## Design decisions (rev B)
-1. **Elbow fold (~26°):** offset elbow, with the forearm running beside the upper arm instead of in line with it, so the two can pass each other. Mount the elbow motor on the upper arm behind the shoulder axis, belted to the elbow reducer, where it also acts as a counterweight.
-2. **Far-corner margin:** shoulder axis raised from 12 to 18 cm (the base gets taller; no torque cost). Keeps a1 at carry height at 92 % even with the longer roll wrist (15 cm). Fallback: forearm 30 cm.
-3. **Shoulder torque:** long-body NEMA 17 (~0.65 Nm) plus a spring counterbalance at the shoulder; keep 20:1. Fallback: 30:1.
-4. **Motor count:** resolved, 5th motor = wrist roll (NEMA 14 or pancake NEMA 17). Add a 6th TMC2209.
-5. **Homing:** AS5600 magnetic encoder on each joint output, giving absolute position at power-up and step-loss detection. Gripper homes by closing to a switch.
+## Open items / to verify at the first test print
+- Fits: `fit` (0.15) and `press` (−0.05) in `DriveParams`, printed pulley tooth shape, ring-pin pockets.
+- AS5600 board size and hole pitch (assumed 23 × 23 mm, 17 mm) and magnet air gap (1.5 mm).
+- Turntable ball race preload (no shim yet).
+- Gripper homing switch position (not modelled), cable routing along the links (not modelled).
+- Camera pole (not modelled).
+- Firmware: ESP32 step generation, AS5600 via TCA9548A, Pi IK = `cad/kinematics.py`.
 
 ## Log
-- 2026-11-10: Project started. Concept diagrams (layout, IK side view, cycloid animation, system, turn sequence).
-- 2026-11-10: Decided 5th motor = wrist roll. Adopted answers to questions 1–5 (rev B): offset elbow, elbow motor behind shoulder, shoulder at 18 cm, long-body shoulder motor + spring counterbalance, AS5600 per joint.
-- 2026-11-10: First CadQuery model of the shoulder drive; no interference at 6 test angles.
+- 2026-11-10: Project started. Concept diagrams.
+- 2026-11-10: Rev B decisions. First shoulder drive model.
+- 2026-11-10: Rev C: complete parametric arm in CadQuery (base, turntable, tower, links, 4 drives, wrist, gripper), build checks, BOM, 3D viewer.
 
 ## Next step
-Test print of the shoulder drive (discs + ring + plate) to check fits and backlash, then add the AS5600 magnet pocket and the base-yoke mount.
+First test print when back in the workshop: one J2 drive (back cover, housing ring, both discs, input shaft, pulley, output flange, cap, clamp). Check fits and backlash, then tune `fit` / `press`. Order hardware only after that (needs your OK).

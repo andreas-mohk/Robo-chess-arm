@@ -1,0 +1,190 @@
+<meta charset="utf-8">
+<title>Chess Arm 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: viewport-filling 3D stage with a control rail; rail drops below the stage on narrow screens */
+:root{
+  --paper:#F2F4F1; --plate:#FBFCFA; --ink:#1C2320; --muted:#5D6A64; --rule:#CCD4CF; --arm:#0E6B66; --hot:#B9770E;
+  --stage:#E7ECE8;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#111614;--plate:#171D1A;--ink:#E3EAE6;--muted:#93A29B;--rule:#2D3833;--arm:#46C4B9;--hot:#E6B44A;--stage:#1A211E;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#111614;--plate:#171D1A;--ink:#E3EAE6;--muted:#93A29B;--rule:#2D3833;--arm:#46C4B9;--hot:#E6B44A;--stage:#1A211E;color-scheme:dark}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font:14px/1.5 var(--body)}
+.app{display:grid;grid-template-columns:1fr 320px;height:100%;min-height:520px}
+#stage{position:relative;background:var(--stage);min-width:0}
+#stage canvas{display:block;width:100%;height:100%}
+#status{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:12px;font:12px var(--mono);color:var(--muted)}
+.rail{border-left:1px solid var(--rule);background:var(--plate);overflow-y:auto;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1{font:600 26px/1.1 var(--display);margin:0}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sec{display:flex;flex-direction:column;gap:8px}
+label{display:grid;grid-template-columns:44px 1fr 56px;gap:8px;align-items:center;font:12px var(--mono)}
+label output{text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--arm)}
+select,button{font:500 13px var(--mono);color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:7px 9px}
+button{cursor:pointer}button:hover{border-color:var(--arm)}
+button.primary{background:var(--arm);border-color:var(--arm);color:var(--plate)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font:12px var(--mono);color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+p.note{margin:0;color:var(--muted);font-size:13px}
+@media (max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:62vh auto;height:auto}.rail{border-left:0;border-top:1px solid var(--rule)}}
+</style>
+
+<div class="app">
+  <div id="stage"><div id="status">Loading model…</div></div>
+  <aside class="rail">
+    <div class="sec">
+      <div class="eyebrow">Concept model · rev C</div>
+      <h1>Chess Arm 3D</h1>
+      <p class="note">Generated from the CadQuery sources. Drag to orbit, scroll to zoom. Joint angles for every square come from the same inverse kinematics the build checks use.</p>
+    </div>
+    <div class="sec">
+      <div class="eyebrow">Play a move</div>
+      <div class="row">
+        <select id="from" aria-label="From square"></select>
+        <span>→</span>
+        <select id="to" aria-label="To square"></select>
+        <button id="play" class="primary">Play</button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="eyebrow">Go to</div>
+      <div class="row">
+        <select id="preset" aria-label="Pose"></select>
+        <button id="go">Go</button>
+      </div>
+    </div>
+    <div class="sec" id="sliders">
+      <div class="eyebrow">Joints (degrees)</div>
+    </div>
+    <div class="sec">
+      <div class="eyebrow">Colours</div>
+      <div class="legend">
+        <span><span class="sw" style="background:#127370"></span>printed</span>
+        <span><span class="sw" style="background:#CC8C26"></span>cycloidal drives</span>
+        <span><span class="sw" style="background:#5A5E66"></span>bought parts</span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from "three";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+const stage=document.getElementById("stage"), status=document.getElementById("status");
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(35,1,5,5000);
+camera.up.set(0,0,1);
+camera.position.set(-1050,60,760);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.target.set(0,250,170);controls.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x8a9590,2.4));scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-300,-400,900);scene.add(sun);
+function themeBg(){scene.background=new THREE.Color(css("--stage")||"#E7ECE8")}
+themeBg();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",themeBg);
+new MutationObserver(themeBg).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+const data=await fetch("model/poses.json").then(r=>r.json());
+const G=data.geom, P=data.poses;
+const deg=THREE.MathUtils.degToRad;
+
+// scene graph mirroring cad/assembly.py frames (CAD units mm, z up)
+const world=new THREE.Group();scene.add(world);
+const yaw=new THREE.Group();world.add(yaw);
+const arm=new THREE.Group();arm.position.x=-G.yaw_x;yaw.add(arm);
+const upper=new THREE.Group(), fore=new THREE.Group(), tool=new THREE.Group(), grip=new THREE.Group();
+arm.add(upper,fore,tool);tool.add(grip);
+grip.position.set(G.x_g,0,G.z_grip_top);
+
+// board, tray and pieces for context
+const sq=G.square, b0=G.base_to_board, bz=G.board_top_z;
+const light=new THREE.MeshStandardMaterial({color:0xe6dfce,roughness:.8}), dark=new THREE.MeshStandardMaterial({color:0x8f7f62,roughness:.8});
+for(let f=0;f<8;f++)for(let r=1;r<=8;r++){const m=new THREE.Mesh(new THREE.BoxGeometry(sq,sq,bz),(f+r)%2?light:dark);m.position.set((3.5-f)*sq,b0+(8-r)*sq+sq/2,bz/2);world.add(m)}
+const wood=new THREE.MeshStandardMaterial({color:0xcfc6b2,roughness:.9});
+const table=new THREE.Mesh(new THREE.PlaneGeometry(1400,1100),new THREE.MeshStandardMaterial({color:0xbfc7c2,roughness:1}));table.position.set(0,250,-0.5);world.add(table);
+const pieceMat=[new THREE.MeshStandardMaterial({color:0xf2efe8,roughness:.5}),new THREE.MeshStandardMaterial({color:0x2a2a2a,roughness:.5})];
+const back="rnbqkbnr", heights={p:50,r:58,n:64,b:72,q:85,k:95};
+const pieces={};
+function addPiece(sqName,type,colour){const f="abcdefgh".indexOf(sqName[0]),r=+sqName[1];const h=heights[type],rad=type==="p"?12:15;
+  const g=new THREE.CylinderGeometry(rad*.65,rad,h,24);g.rotateX(Math.PI/2);const m=new THREE.Mesh(g,pieceMat[colour]);
+  m.position.set((3.5-f)*sq,b0+(8-r)*sq+sq/2,bz+h/2);world.add(m);pieces[sqName]=m}
+for(let f=0;f<8;f++){const F="abcdefgh"[f];addPiece(F+"1",back[f],0);addPiece(F+"2","p",0);addPiece(F+"7","p",1);addPiece(F+"8",back[f],1)}
+
+const loader=new GLTFLoader();
+// models ship as base64 text (the host does not serve .glb); decode and parse
+const load=(name,parent)=>fetch(`model/${name}.b64.txt`).then(r=>{if(!r.ok)throw new Error(name);return r.text()}).then(b64=>{
+  const bin=atob(b64.trim()),buf=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+  return new Promise((res,rej)=>loader.parse(buf.buffer,"",g=>{
+    // GLB from CadQuery is y-up; undo that so the CAD frames hold
+    g.scene.rotation.x=Math.PI/2;g.scene.traverse(o=>{if(o.isMesh){o.material.side=THREE.DoubleSide}});parent.add(g.scene);res()},rej))});
+let loaded=0;const total=6;
+const tick=()=>{loaded++;status.textContent=loaded<total?`Loading model… ${loaded}/${total}`:"Drag to orbit · scroll to zoom"};
+try{
+  await Promise.all([load("base",world).then(tick),load("turret",arm).then(tick),load("upper",upper).then(tick),
+    load("fore",fore).then(tick),load("tool",tool).then(tick),load("gripper",grip).then(tick)]);
+}catch(e){status.textContent="Could not load the model files."}
+
+// joints
+const J=[0,100,-150,-40,0];
+const names=["J1 base","J2 shoulder","J3 elbow","J4 wrist","J5 roll"], lims=[[-90,90],[0,130],[-170,0],[-120,60],[-90,90]];
+const sl=document.getElementById("sliders");const inputs=[];
+names.forEach((n,i)=>{const l=document.createElement("label");l.innerHTML=`<span>${n.split(" ")[0]}</span><input type="range" id="j${i}" min="${lims[i][0]}" max="${lims[i][1]}" step="0.5" aria-label="${n}"><output></output>`;
+  sl.appendChild(l);const inp=l.querySelector("input");inp.value=J[i];inp.addEventListener("input",()=>{stop();J[i]=+inp.value;apply()});inputs.push(inp)});
+function apply(){
+  const [j1,j2,j3,j4,j5]=J;
+  yaw.rotation.z=deg(j1);
+  const a2=deg(j2),a3=deg(j2+j3);
+  upper.position.set(0,0,G.shoulder_z);upper.rotation.x=a2;
+  const ey=G.L1*Math.cos(a2), ez=G.shoulder_z+G.L1*Math.sin(a2);
+  fore.position.set(0,ey,ez);fore.rotation.x=a3;
+  tool.position.set(0,ey+G.L2*Math.cos(a3),ez+G.L2*Math.sin(a3));tool.rotation.x=deg(j2+j3+j4+90);
+  grip.rotation.z=deg(j5);
+  inputs.forEach((inp,i)=>{inp.value=J[i];inp.nextElementSibling.textContent=(J[i]>=0?"+":"")+J[i].toFixed(1)});
+}
+apply();
+
+// presets and moves
+const keys=Object.keys(P).filter(k=>!k.endsWith("+")&&k!=="park"&&k!=="tray").sort();
+const pre=document.getElementById("preset"), from=document.getElementById("from"), to=document.getElementById("to");
+["park","tray","tray+",...Object.keys(P).filter(k=>k!=="park"&&!k.startsWith("tray")).sort()].forEach(k=>pre.add(new Option(k.endsWith("+")?k.slice(0,-1)+" (carry height)":k,k)));
+keys.forEach(k=>{from.add(new Option(k,k));to.add(new Option(k,k))});
+from.value="e7";to.value="e5";pre.value="e4";
+let anim=null;
+function stop(){anim=null}
+function sequence(list){const steps=[];let cur=J.slice();for(const t of list){steps.push([cur,t]);cur=t}return steps}
+function run(steps,onStep){let i=0,t0=performance.now();const dur=s=>{const d=Math.max(...s[0].map((v,k)=>Math.abs(v-s[1][k])));return 350+d*9};
+  anim=now=>{if(!anim)return;const s=steps[i];const u=Math.min(1,(now-t0)/dur(s));const e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+    for(let k=0;k<5;k++)J[k]=s[0][k]+(s[1][k]-s[0][k])*e;apply();
+    if(u>=1){onStep&&onStep(i);i++;t0=now;if(i>=steps.length){anim=null;return}}requestAnimationFrame(anim)};requestAnimationFrame(anim)}
+document.getElementById("go").addEventListener("click",()=>run(sequence([P[pre.value]])));
+document.getElementById("play").addEventListener("click",()=>{
+  const a=from.value,b=to.value,piece=pieces[a];if(!P[a]||!P[b])return;
+  const seq=[P[a+"+"],P[a],P[a+"+"],P[b+"+"],P[b],P[b+"+"],P.park];
+  let carrying=false;
+  run(sequence(seq),i=>{
+    if(i===1&&piece){carrying=true;grip.attach(piece)}
+    if(i===4&&piece&&carrying){world.attach(piece);carrying=false;
+      const f="abcdefgh".indexOf(b[0]),r=+b[1];piece.position.x=(3.5-f)*sq;piece.position.y=b0+(8-r)*sq+sq/2;piece.position.z=bz+piece.geometry.parameters.height/2;piece.rotation.set(0,0,0);
+      delete pieces[a];if(pieces[b])world.remove(pieces[b]);pieces[b]=piece}
+  });
+});
+run(sequence([P["e4+"]]));
+
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(stage);resize();
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+</script>
