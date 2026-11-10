@@ -15,12 +15,13 @@ import cadquery as cq
 
 import assembly as A
 import base
+import camera
 import kinematics as K
 import links
 import wrist
 from config import CFG
 from cycloidal import interference_report
-from hardware import (AL_TUBE, AS5600, BEARINGS, DOWEL_PRICE, GEARED, MOTOR_PULLEY, MOTORS, STEEL_BALL_PRICE,
+from hardware import (AL_TUBE, AS5600, BEARINGS, COMPUTERS, LM6UU, WEBCAMS, DOWEL_PRICE, GEARED, MOTOR_PULLEY, MOTORS, STEEL_BALL_PRICE,
                       STEEL_DENSITY)
 from layout import D1, D2, D3, D4, summary
 
@@ -97,7 +98,7 @@ def table_and_board():
 def collision_sweep():
     poses = [("d8", False), ("d8", True), ("e8", False), ("a8", False), ("h8", False), ("a1", False), ("a1", True),
              ("h1", False), ("h1", True), ("e4", False), ("tray", False), ("tray", True)]
-    names = ["base", "turret", "upper", "fore", "tool"]
+    names = ["base", "camera", "turret", "upper", "fore", "tool"]
     env = table_and_board()
     found = 0
     for name, carry in poses + [("park", None)]:
@@ -113,7 +114,7 @@ def collision_sweep():
         for i, a in enumerate(names):
             for b in names[i + 1:]:
                 hits += [(a, b) + h for h in clashes(w[a], w[b])]
-        for g in names[1:]:
+        for g in names[2:]:
             hits += [(g, "table/board") + h for h in clashes(w[g], env)]
         if name != "park" and not carry:
             for g in ("upper", "fore", "tool"):
@@ -124,9 +125,18 @@ def collision_sweep():
             log(f"  CLASH at {label}: " + "; ".join(f"{h[2]} x {h[3]} ({h[4]} mm3)" for h in hits[:6]))
         else:
             log(f"  {label}: clear")
+    # parked, the arm must stay out of the camera's view of the board
+    w = A.posed(K.PARK)
+    view = {"camera_view": camera.view_frustum()}
+    seen = [h for g in ("turret", "upper", "fore", "tool") for h in clashes(w[g], view)]
+    if seen:
+        found += 1
+        log("  IN VIEW when parked: " + ", ".join(sorted({h[0] for h in seen})))
+    else:
+        log("  parked arm is out of the camera's view of the board")
     # inside the base: electronics, J1 motor, shelf, sensor bridge, floor must not overlap
     bp, bh, bd = A.groups()["base"]
-    inside = {k: v for k, v in {**bh, **bp}.items() if k in ("pi5", "esp32_board", "buck", "oled", "J1_motor",
+    inside = {k: v for k, v in {**bh, **bp}.items() if k in ("computer", "esp32_board", "buck", "oled", "J1_motor",
                                                            "j1_motor_shelf", "J1_sensor_bridge", "base_floor")}
     names_in = list(inside)
     hits = []
@@ -166,11 +176,17 @@ def _hw_mass(name, w):
         return MOTORS[C.roll_motor].mass
     if n == "gripper_motor":
         return GEARED[C.gripper_motor].mass
+    if n == "lm6uu":
+        return 4 * LM6UU["mass"]
+    if n == "roll_bearing":
+        return BEARINGS["6804"].mass
+    if n == "home_switch":
+        return 0.002
     if n in ("gripper_rods",):
         return sum(s.Volume() for s in w.vals()) * STEEL_DENSITY
     if n == "race_balls":
         return len(w.vals()) * 0.00088
-    return {"pi5": 0.05, "esp32_board": 0.10, "buck": 0.03, "oled": 0.01}.get(n, 0.0)
+    return {"computer": 0.05, "esp32_board": 0.10, "buck": 0.03, "oled": 0.01}.get(n, 0.0)
 
 
 def _drive_steel(D):
@@ -298,10 +314,16 @@ def bom():
     add(f"J6 gripper motor {C.gripper_motor}", 1, GEARED[C.gripper_motor].price, "cut the middle trace to run it bipolar")
     add(f"Aluminium tube {C.tube}, 2 x {C.L1 - 2 * links.TUBE_START:.0f} mm", 1, AL_TUBE[C.tube]["price_per_m"])
     add(f"Steel balls {C.ball_d:g} mm (race)", base.balls()[1], STEEL_BALL_PRICE)
-    add(f"Steel rod {wrist.ROD_D:g} mm, 2 x {2 * (wrist.U_WALL + wrist.WALL_T):.0f} mm (gripper)", 1, 2.0)
+    add(f"Steel rod {wrist.ROD_D:g} mm, 2 x {2 * (wrist.U_IN + wrist.WALL_T):.0f} mm (gripper)", 1, 2.5)
+    add("LM6UU linear bushing (gripper jaws)", 4, LM6UU["price"])
+    add("6804 bearing (wrist roll)", 1, BEARINGS["6804"].price)
+    pole_len = camera.Z_POLE_TOP - camera.Z_POLE_BOT + camera.BOOM_X1 - camera.BOOM_X0
+    add(f"Aluminium tube {C.pole_tube}, {camera.Z_POLE_TOP - camera.Z_POLE_BOT:.0f} + {camera.BOOM_X1 - camera.BOOM_X0:.0f} mm (camera pole)",
+        1, AL_TUBE[C.pole_tube]["price_per_m"] * pole_len / 1000 + 1.0)
+    add("1/4\"-20 x 10 screw (webcam) + M4 bolts (pole)", 1, 1.5)
     add("M4 bolts + nuts (tube sockets, tower foot, baseplate)", 16, 0.10)
     add("M3 / M2.5 / M2 assorted screws, grub screws", 1, 6.0)
-    add("Raspberry Pi 5 4 GB", 1, 65.0)
+    add(COMPUTERS[C.computer]["name"], 1, COMPUTERS[C.computer]["price"])
     add("ESP32 dev board", 1, 6.0)
     add("TMC2209 driver", 6, 4.5)
     add("Buck converter 24 V -> 5 V 5 A", 1, 6.0)
@@ -345,11 +367,11 @@ def export_viewer():
     import base64
     (OUT / "glb").mkdir(parents=True, exist_ok=True)
     g = A.groups(0.0)
-    for gname in ("base", "turret", "upper", "fore"):
+    for gname in ("base", "camera", "turret", "upper", "fore"):
         p, h, d = g[gname]
         export_glb(gname, {"printed": p, "hardware": h, "drive": d})
     tool_fixed = {"wrist_bracket": wrist.wrist_bracket()}
-    export_glb("tool", {"printed": tool_fixed, "hardware": {"roll_motor": wrist.roll_motor()},
+    export_glb("tool", {"printed": tool_fixed, "hardware": {"roll_motor": wrist.roll_motor(), "roll_bearing": wrist.roll_bearing()},
                         "drive": links.j4_output_in_tool()})
     gp, gh = wrist.build_gripper()
     hub = wrist.roll_hub().translate((-wrist.X_G, 0, -wrist.Z_GRIP_TOP))
@@ -388,7 +410,7 @@ def exports():
             asm.add(cq.Compound.makeCompound(w.vals()), name=n)
     asm.export(str(OUT / "chess_arm_assembly.step"))
     export_viewer()
-    log(f"  exported {len(parts)} printed parts (STL + STEP), assembly STEP, 6 GLB groups -> {OUT}")
+    log(f"  exported {len(parts)} printed parts (STL + STEP), assembly STEP, 7 GLB groups -> {OUT}")
 
 
 # ------------------------------------------------------------------ main
@@ -427,6 +449,21 @@ def main():
             log(f"  {j}: worst disc/pin overlap {w:.4f} mm3, part overlaps {pairs or 'none'}")
             if w > 0.05 or pairs:
                 problems.append(f"{j} drive interference")
+    if not QUICK:
+        log("\n## Gripper internals (jaws, racks, frame, switch over the opening range)")
+        ic = wrist.internal_clashes()
+        if ic:
+            problems.append("gripper internal clashes")
+            log("  CLASH: " + "; ".join(f"opening {o:g}: {a} x {b} ({v} mm3)" for o, a, b, v in ic))
+        else:
+            log("  clear at 10 mm, half and full opening")
+    log("\n## Camera")
+    fits, nx, ny, cov = camera.fov_report()
+    log(f"  {C.webcam} at {C.camera_h:.0f} mm needs {nx:.1f} x {ny:.1f} deg, has {WEBCAMS[C.webcam]['hfov']} x "
+        f"{WEBCAMS[C.webcam]['vfov']} deg: {'board fits' if fits else 'BOARD DOES NOT FIT'} "
+        f"(covers {cov[0]:.0f} x {cov[1]:.0f} mm at the board)")
+    if not fits:
+        problems.append("camera field of view too small for the board; raise camera_h")
     log("\n## Torque (gravity over every target pose, gripper vertical)")
     torque_check()
     log("\n## Print bed")

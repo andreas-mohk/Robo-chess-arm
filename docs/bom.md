@@ -48,10 +48,14 @@
 | J6 gripper motor 28BYJ-48 | 1 | 2.00 | 2.00 | cut the middle trace to run it bipolar |
 | Aluminium tube 15x15x1.5, 2 x 190 mm | 1 | 5.00 | 5.00 |  |
 | Steel balls 6 mm (race) | 64 | 0.03 | 1.92 |  |
-| Steel rod 4 mm, 2 x 104 mm (gripper) | 1 | 2.00 | 2.00 |  |
+| Steel rod 6 mm, 2 x 106 mm (gripper) | 1 | 2.50 | 2.50 |  |
+| LM6UU linear bushing (gripper jaws) | 4 | 0.60 | 2.40 |  |
+| 6804 bearing (wrist roll) | 1 | 1.50 | 1.50 |  |
+| Aluminium tube 20x20x1.5, 669 + 277 mm (camera pole) | 1 | 6.68 | 6.68 |  |
+| 1/4"-20 x 10 screw (webcam) + M4 bolts (pole) | 1 | 1.50 | 1.50 |  |
 | M4 bolts + nuts (tube sockets, tower foot, baseplate) | 16 | 0.10 | 1.60 |  |
 | M3 / M2.5 / M2 assorted screws, grub screws | 1 | 6.00 | 6.00 |  |
-| Raspberry Pi 5 4 GB | 1 | 65.00 | 65.00 |  |
+| Raspberry Pi 4 Model B 1 GB | 1 | 35.00 | 35.00 |  |
 | ESP32 dev board | 1 | 6.00 | 6.00 |  |
 | TMC2209 driver | 6 | 4.50 | 27.00 |  |
 | Buck converter 24 V -> 5 V 5 A | 1 | 6.00 | 6.00 |  |
@@ -62,4 +66,4 @@
 | Mini limit switch (gripper home) | 1 | 0.50 | 0.50 |  |
 | Wire, connectors, perfboard | 1 | 15.00 | 15.00 |  |
 | PETG filament (~1.5 kg) | 1 | 30.00 | 30.00 |  |
-| **Total** | | | **302** | budget 300 |
+| **Total** | | | **284** | budget 300 |

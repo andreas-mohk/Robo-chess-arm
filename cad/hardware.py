@@ -143,11 +143,21 @@ OLED = {
     "SH1106_13":   dict(board_w=35.4, board_h=33.5, window_w=30.0, window_h=15.0, window_dy=-1.5,
                         hole_pitch_x=30.4, hole_pitch_y=28.5, hole_d=2.2),
 }
-PI5 = dict(w=85.0, d=56.0, h=30.0, holes=(58.0, 49.0), hole_inset=3.5, hole_d=2.7, mass=0.05)
+COMPUTERS = {   # same 85 x 56 footprint and 58 x 49 hole pattern; h includes a heatsink
+    "PI4_1GB": dict(name="Raspberry Pi 4 Model B 1 GB", w=85.0, d=56.0, h=25.0, holes=(58.0, 49.0), hole_d=2.7, mass=0.046, price=35.0),
+    "PI5_4GB": dict(name="Raspberry Pi 5 4 GB", w=85.0, d=56.0, h=30.0, holes=(58.0, 49.0), hole_d=2.7, mass=0.05, price=65.0),
+}
 ESP32_BOARD = dict(w=90.0, d=62.0, h=25.0, holes=(83.0, 55.0), hole_d=3.2)    # perfboard with ESP32 + 6 x TMC2209
 BUCK = dict(w=60.0, d=35.0, h=20.0, holes=(52.0, 27.0), hole_d=3.2)            # 24 V -> 5 V 5 A for the Pi
 DC_JACK_D = 8.0                                                                 # panel-mount 5.5/2.1 barrel jack
 BUTTON = dict(body=12.0, cap_d=11.5, hole_d=12.4)                             # 12 x 12 tactile switch with cap
+
+LM6UU = dict(d=6.0, D=12.0, L=19.0, price=0.6, mass=0.008)        # linear ball bushing for 6 mm rod
+MICROSWITCH = dict(w=20.0, d=6.4, h=10.2, hole_pitch=9.5, hole_d=2.3, price=0.5)   # SS-5GL style
+WEBCAMS = {   # body size with the lens facing down; check your camera and its field of view
+    "C920": dict(w=95.0, d=29.0, h=25.0, hfov=70.4, vfov=43.3, tripod_thread=True),
+    "C270": dict(w=73.0, d=32.0, h=22.0, hfov=55.0, vfov=42.0, tripod_thread=False),
+}
 
 # --- stock material
 AL_TUBE = {  # square aluminium tube

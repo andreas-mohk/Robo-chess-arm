@@ -50,6 +50,7 @@ class Config:
     carry_lift: float = 100.0         # extra height while carrying (clears a 95 mm king)
     tray_xy: tuple = (280.0, 60.0)    # capture tray centre, world X, Y
     tray_size: tuple = (80.0, 100.0)
+    park_xyz: tuple = (260.0, -30.0, 200.0)   # fingertips while waiting: beside the base, out of the camera's view
 
     # ---------------- arm geometry
     shoulder_z: float = 230.0         # J2 axis above the table
@@ -78,6 +79,7 @@ class Config:
     tower_t: float = 6.0
     tower_w: float = 96.0             # tower plate width (along Y)
     oled: str = "SH1106_13"
+    computer: str = "PI4_1GB"         # key in hardware.COMPUTERS
     buttons: int = 3
 
     # ---------------- wrist and gripper
@@ -85,7 +87,15 @@ class Config:
     gripper_motor: str = "28BYJ-48"
     jaw_open_max: float = 42.0        # finger gap fully open
     finger_len: float = 75.0          # fingertips -> carriage; keeps the gripper body above a 95 mm king
-    tool_len_target: float = 154.0    # J4 axis -> fingertips; build warns if the design differs by > 5 mm
+    tool_len_target: float = 169.5    # J4 axis -> fingertips; build warns if the design differs by > 5 mm
+
+    # ---------------- camera pole
+    webcam: str = "C920"              # key in hardware.WEBCAMS
+    camera_xy: tuple = (0.0, 300.0)   # above the board centre
+    camera_h: float = 600.0           # lens above the board surface
+    pole_xy: tuple = (-300.0, 300.0)  # beside the h-file, clear of the arm and the capture tray
+    pole_tube: str = "20x20x1.5"
+    view_margin: float = 20.0         # extra field of view required around the board, each side
 
     # ---------------- printing and materials
     bed: tuple = (220.0, 220.0, 250.0)

@@ -39,7 +39,7 @@ p.note{margin:0;color:var(--muted);font-size:13px}
   <div id="stage"><div id="status">Loading model…</div></div>
   <aside class="rail">
     <div class="sec">
-      <div class="eyebrow">Concept model · rev C</div>
+      <div class="eyebrow">Concept model · rev D</div>
       <h1>Chess Arm 3D</h1>
       <p class="note">Generated from the CadQuery sources. Drag to orbit, scroll to zoom. Joint angles for every square come from the same inverse kinematics the build checks use.</p>
     </div>
@@ -61,6 +61,10 @@ p.note{margin:0;color:var(--muted);font-size:13px}
     </div>
     <div class="sec" id="sliders">
       <div class="eyebrow">Joints (degrees)</div>
+    </div>
+    <div class="sec">
+      <div class="eyebrow">Show</div>
+      <label style="grid-template-columns:auto 1fr"><input type="checkbox" id="showCam" checked> <span>Camera pole</span></label>
     </div>
     <div class="sec">
       <div class="eyebrow">Colours</div>
@@ -89,9 +93,9 @@ stage.prepend(renderer.domElement);
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(35,1,5,5000);
 camera.up.set(0,0,1);
-camera.position.set(-1050,60,760);
+camera.position.set(-1150,-80,900);
 const controls=new OrbitControls(camera,renderer.domElement);
-controls.target.set(0,250,170);controls.enableDamping=true;
+controls.target.set(-40,250,250);controls.enableDamping=true;
 scene.add(new THREE.HemisphereLight(0xffffff,0x8a9590,2.4));scene.add(new THREE.AmbientLight(0xffffff,0.6));
 const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-300,-400,900);scene.add(sun);
 function themeBg(){scene.background=new THREE.Color(css("--stage")||"#E7ECE8")}
@@ -131,13 +135,15 @@ const load=(name,parent)=>fetch(`model/${name}.b64.txt`).then(r=>{if(!r.ok)throw
   return new Promise((res,rej)=>loader.parse(buf.buffer,"",g=>{
     // GLB from CadQuery is y-up; undo that so the CAD frames hold
     g.scene.rotation.x=Math.PI/2;g.scene.traverse(o=>{if(o.isMesh){o.material.side=THREE.DoubleSide}});parent.add(g.scene);res()},rej))});
-let loaded=0;const total=6;
+let loaded=0;const total=7;
+const camGroup=new THREE.Group();world.add(camGroup);
 const tick=()=>{loaded++;status.textContent=loaded<total?`Loading model… ${loaded}/${total}`:"Drag to orbit · scroll to zoom"};
 try{
   await Promise.all([load("base",world).then(tick),load("turret",arm).then(tick),load("upper",upper).then(tick),
-    load("fore",fore).then(tick),load("tool",tool).then(tick),load("gripper",grip).then(tick)]);
+    load("fore",fore).then(tick),load("tool",tool).then(tick),load("gripper",grip).then(tick),load("camera",camGroup).then(tick)]);
 }catch(e){status.textContent="Could not load the model files."}
 
+document.getElementById("showCam").addEventListener("change",e=>{camGroup.visible=e.target.checked});
 // joints
 const J=[0,100,-150,-40,0];
 const names=["J1 base","J2 shoulder","J3 elbow","J4 wrist","J5 roll"], lims=[[-90,90],[0,130],[-170,0],[-120,60],[-90,90]];

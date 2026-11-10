@@ -25,6 +25,9 @@ The build exits with code 1 if any check fails.
 | Bearings, AS5600 board size, OLED type, Pi/ESP32 board sizes | `hardware.py` |
 | Cycloid ratio, pin sizes, eccentricity, print fits | `config.py` → `BIG` (J1-J3) and `SMALL` (J4) |
 | Gripper opening, finger length | `config.py`, gripper internals at the top of `wrist.py` |
+| Webcam model, camera height and position, pole position | `config.py` (`webcam`, `camera_h`, `camera_xy`, `pole_xy`), camera sizes in `hardware.py` → `WEBCAMS` |
+| Raspberry Pi model | `config.py` → `computer` (`hardware.py` → `COMPUTERS`) |
+| Where the arm waits | `config.py` → `park_xyz` |
 | Electronics placement in the base | `base.py` → `LAYOUT` |
 
 Fits: `fit` (clearance for printed holes on steel) and `press` (bearing seats) in `DriveParams`.
@@ -41,7 +44,8 @@ Tune them after the first test print; every drive picks them up.
 | `joints.py` | joint kit: drive + motor + belt + sensor + the holes in its carrier |
 | `base.py` | base box, J1, ball race, turntable, electronics placeholders |
 | `links.py` | tower (J2), upper arm (J3 + its motor), forearm (J4 + its motor) |
-| `wrist.py` | wrist bracket, J5 roll, parallel gripper (J6) with rack and pinion |
+| `wrist.py` | wrist bracket, J5 roll on a 6804, parallel gripper (J6): LM6UU jaws, rack and pinion, home switch |
+| `camera.py` | camera pole, boom, tilting camera plate, field-of-view check |
 | `kinematics.py` | inverse kinematics with the real lateral offset, standard poses |
 | `assembly.py` | places all groups for given joint angles |
 | `build.py` | checks, bill of materials, exports |
@@ -54,9 +58,12 @@ Tune them after the first test print; every drive picks them up.
 4. IK against the assembled model: the fingertip must land on the target.
 5. Gravity torque per joint over every pose ×1.3, against motor × belt × cycloid × efficiency.
 6. Every printed part fits the print bed.
-7. Collision sweep: 13 poses, all arm groups against each other, the table, the board and
-   worst-case tall pieces on the neighbouring squares; plus the parts inside the base.
-8. Cost estimate against the €300 budget.
+7. Gripper internals: jaws, racks, frame and switch at 10 mm, half and full opening.
+8. Camera field of view covers the board plus margin.
+9. Collision sweep: 13 poses, all arm groups against each other, the camera pole, the table,
+   the board and worst-case tall pieces on the neighbouring squares; the parked arm stays out
+   of the camera's view; the parts inside the base don't overlap.
+10. Cost estimate against the €300 budget.
 
 ## Conventions
 

@@ -9,7 +9,7 @@ import cadquery as cq
 
 from common import box, hull_outline, polar
 from config import CFG
-from hardware import BUCK, BUTTON, DC_JACK_D, ESP32_BOARD, OLED, PI5
+from hardware import BUCK, BUTTON, COMPUTERS, DC_JACK_D, ESP32_BOARD, OLED
 from joints import JointKit
 from layout import D1, Z_BASE_TOP, Z_TT, Z_TT_TOP
 
@@ -25,7 +25,7 @@ K1 = JointKit("J1", D1, C.joints["J1"].motor, TOP_T, C.joints["J1"].motor_r, C.j
 
 # electronics layout (world X, Y of each board centre) -- move freely, the build checks for clashes
 LAYOUT = {
-    "pi5": (-52.0, -50.0),
+    "computer": (-52.0, -50.0),
     "esp32_board": (48.0, -52.0),
     "buck": (-55.0, 42.0),
 }
@@ -90,7 +90,7 @@ def base_floor():
     f = f.cut(cq.Workplane("XY").pushPoints(corners).circle(1.7).extrude(FLOOR_T))
     # bolts into the shared baseplate (keeps the board registered to the arm)
     f = f.cut(cq.Workplane("XY").pushPoints([(sx * 70, sy * 25) for sx in (1, -1) for sy in (1, -1)]).circle(2.2).extrude(FLOOR_T))
-    for key, spec, d in (("pi5", PI5, 2.2), ("esp32_board", ESP32_BOARD, 2.6), ("buck", BUCK, 2.6)):
+    for key, spec, d in (("computer", COMPUTERS[C.computer], 2.2), ("esp32_board", ESP32_BOARD, 2.6), ("buck", BUCK, 2.6)):
         cx, cy = LAYOUT[key]
         hx, hy = spec["holes"][0] / 2, spec["holes"][1] / 2
         pts = [(cx + sx * hx, cy + sy * hy) for sx in (1, -1) for sy in (1, -1)]
@@ -158,7 +158,7 @@ def balls():
 def electronics():
     out = {}
     z0 = FLOOR_T + 5
-    for key, spec in (("pi5", PI5), ("esp32_board", ESP32_BOARD), ("buck", BUCK)):
+    for key, spec in (("computer", COMPUTERS[C.computer]), ("esp32_board", ESP32_BOARD), ("buck", BUCK)):
         cx, cy = LAYOUT[key]
         out[key] = box(cx, cy, z0 + spec["h"] / 2, spec["w"], spec["d"], spec["h"])
     o = OLED[C.oled]

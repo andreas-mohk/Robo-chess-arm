@@ -4,6 +4,7 @@ from math import cos, radians, sin
 import cadquery as cq
 
 import base
+import camera
 import links
 import wrist
 from config import CFG
@@ -27,6 +28,8 @@ def groups(roll_deg=0.0):
             "upper": (up, uh, ud),
             "fore": (fp, fh, fd),
         })
+        cp, ch = camera.camera_group()
+        _CACHE["camera"] = (cp, ch, {})
     tool_p, tool_h = wrist.build_wrist(roll_deg)
     return {**_CACHE, "tool": (tool_p, tool_h, links.j4_output_in_tool())}
 
@@ -46,6 +49,7 @@ def frames(j):
 
     return {
         "base": lambda w: w,
+        "camera": lambda w: w,
         "turret": arm_to_world,
         "upper": lambda w: arm_to_world(rx(w, j2).translate((0, 0, C.shoulder_z))),
         "fore": lambda w: arm_to_world(rx(w, j2 + j3).translate(elbow)),

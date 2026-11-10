@@ -65,7 +65,14 @@ def pose(name, carry=False):
     return ik(X, Y, z)
 
 
-PARK = (0.0, 100.0, -150.0, -40.0, 0.0)   # folded up and back, out of the camera's view
+def _park():
+    s = ik(*C.park_xyz, roll_mode="aligned")
+    if not s["ok"]:
+        raise ValueError(f"park position unreachable: {s['why']}")
+    return tuple(round(v, 2) for v in s["j"])
+
+
+PARK = _park()
 
 
 def all_targets():
