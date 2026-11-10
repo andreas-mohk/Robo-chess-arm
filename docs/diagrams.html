@@ -67,9 +67,9 @@ svg .mut{fill:var(--muted)}
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">Concept sheet · rev A · 2026-11-10</div>
+  <div class="eyebrow">Concept sheet · rev B · 2026-11-10</div>
   <h1>Chess Robot Arm</h1>
-  <p class="lede">A 4-axis articulated arm with a two-finger gripper, stepper-driven through printed cycloidal reducers, playing a 40 × 40 cm board under a fixed overhead camera. Drawings below are to scale unless marked schematic; all dimensions in cm.</p>
+  <p class="lede">A 5-axis articulated arm (base, shoulder, elbow, wrist pitch, wrist roll) with a two-finger gripper, stepper-driven through printed cycloidal reducers, playing a 40 × 40 cm board under a fixed overhead camera. Drawings below are to scale unless marked schematic; all dimensions in cm.</p>
 </header>
 
 <section id="reach">
@@ -88,7 +88,7 @@ svg .mut{fill:var(--muted)}
   </div>
   <div class="two">
     <div class="plate"><svg id="top" viewBox="-40 -4 80 72" role="img" aria-label="Top view of board, arm base and reach"></svg><div class="cap">Fig. 1 · top view · 1 grid = 5 cm</div></div>
-    <div class="plate"><svg id="side" viewBox="-14 -66 78 70" role="img" aria-label="Side view of the arm reaching the selected square"></svg><div class="cap">Fig. 2 · side view in the arm's plane · solid = gripping, dashed = carry</div></div>
+    <div class="plate"><svg id="side" viewBox="-14 -66 78 70" role="img" aria-label="Side view of the arm reaching the selected square"></svg><div class="cap">Fig. 2 · side view in the arm's plane · solid = gripping, dashed = carry · square behind shoulder = elbow motor, belt dotted</div></div>
   </div>
   <div class="readout" id="ro"></div>
   <div id="flags" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -103,10 +103,11 @@ svg .mut{fill:var(--muted)}
     <thead><tr><th>Joint</th><th>Motion</th><th>Range needed*</th><th>Drive</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td class="m">J1 base</td><td>Yaw about vertical axis</td><td class="m" id="r1">–</td><td>NEMA 17 + cycloidal, lazy-susan or large bearing carries arm weight</td><td>ratio open</td></tr>
-      <tr><td class="m">J2 shoulder</td><td>Pitch, lifts the whole arm</td><td class="m" id="r2">–</td><td>NEMA 17 + 20:1 cycloidal, 6806 output bearing, design torque 10 Nm</td><td>next to design</td></tr>
-      <tr><td class="m">J3 elbow</td><td>Pitch, folds forearm</td><td class="m" id="r3">–</td><td>NEMA 17 + cycloidal; could sit at the shoulder with a belt to cut forearm load</td><td>ratio open</td></tr>
-      <tr><td class="m">J4 wrist</td><td>Pitch, keeps gripper vertical</td><td class="m" id="r4">–</td><td>Small stepper (NEMA 14/17-pancake) + reducer</td><td>open</td></tr>
-      <tr><td class="m">J5 gripper</td><td>Two parallel fingers</td><td class="m">~0–4 cm open</td><td>Small stepper with lead screw or rack</td><td>open</td></tr>
+      <tr><td class="m">J2 shoulder</td><td>Pitch, lifts the whole arm</td><td class="m" id="r2">–</td><td>Long-body NEMA 17 (~0.65 Nm) + 20:1 cycloidal, 6806 output bearing, spring counterbalance, design torque 10 Nm</td><td>designing now</td></tr>
+      <tr><td class="m">J3 elbow</td><td>Pitch, folds forearm</td><td class="m" id="r3">–</td><td>NEMA 17 mounted behind the shoulder axis (counterweight), belt to cycloidal at the elbow; offset elbow so the forearm passes beside the upper arm</td><td>ratio open</td></tr>
+      <tr><td class="m">J4 wrist</td><td>Pitch, keeps gripper vertical</td><td class="m" id="r4">–</td><td>Small stepper (NEMA 14/17-pancake) + reducer</td><td>ratio open</td></tr>
+      <tr><td class="m">J5 wrist roll</td><td>Turns the gripper about its own axis</td><td class="m">±90°</td><td>NEMA 14 or pancake NEMA 17, small belt or reducer</td><td>decided</td></tr>
+      <tr><td class="m">J6 gripper</td><td>Two parallel fingers</td><td class="m">~0–4 cm open</td><td>Small stepper with lead screw or rack; homes against a switch</td><td>open</td></tr>
     </tbody></table></div>
   <p class="note">* Computed over all 64 squares plus the capture tray, gripping and carry heights, using the assumptions in Fig. 2. Joint angles: J2 from horizontal, J3 relative to the upper arm, J4 relative to the forearm.</p>
 </section>
@@ -193,10 +194,10 @@ svg .mut{fill:var(--muted)}
       <text x="286" y="158" class="mut" font-size="12">menu: difficulty, puzzles</text>
       <text x="596" y="106" font-weight="500">ESP32</text>
       <text x="596" y="126" class="mut" font-size="12">step generation, accel ramps,</text>
-      <text x="596" y="144" class="mut" font-size="12">homing, e-stop</text>
-      <text x="596" y="226">5 × TMC2209 → steppers</text><text x="596" y="246" class="mut" font-size="12">J1 J2 J3 J4 + gripper</text>
+      <text x="596" y="144" class="mut" font-size="12">AS5600 reads, e-stop</text>
+      <text x="596" y="226">6 × TMC2209 → steppers</text><text x="596" y="246" class="mut" font-size="12">J1–J5 + gripper</text>
       <text x="34" y="296">PSU 24 V</text><text x="34" y="318" class="mut" font-size="11">motors direct</text>
-      <text x="656" y="314">homing switches</text>
+      <text x="652" y="308" font-size="13">AS5600 angle sensors</text><text x="652" y="324" class="mut" font-size="11">one per joint output</text>
     </g>
     <g font-size="11" class="mut">
       <text x="168" y="62" class="mut">USB</text><text x="162" y="172" class="mut">I²C / GPIO</text>
@@ -223,15 +224,15 @@ svg .mut{fill:var(--muted)}
 
 <section id="open">
   <div class="sec-head">
-    <div class="eyebrow">Open questions</div>
-    <h2>What these drawings raise</h2>
+    <div class="eyebrow">Decisions · rev B</div>
+    <h2>How the open questions were settled</h2>
   </div>
   <ul class="open">
-    <li><b>Elbow fold near the base.</b> Rank 8 squares are only ~13 cm from the shoulder, so the forearm folds back almost onto the upper arm (see Fig. 2 with d8). The elbow joint and link shapes must allow it without collision.</li>
-    <li><b>Far-corner margin.</b> a1/h1 at carry height need about 93% of full reach. Moving the base further back than 10 cm would eat that margin quickly.</li>
-    <li><b>Motor count.</b> The handover lists five NEMA 17s plus a gripper motor, but four arm joints only need four. Is the fifth a spare, or a wrist roll?</li>
-    <li><b>Homing.</b> Steppers need a reference at power-up. StallGuard is unreliable behind a high-ratio reducer, so plan a switch or hall sensor per joint.</li>
-    <li><b>Gripper length.</b> Assumed 12 cm from wrist axis to fingertips. A shorter gripper lowers the wrist and eases both cases above.</li>
+    <li><b>Elbow fold near the base.</b> Rank 8 needs the forearm to close to about 26° from the upper arm. The elbow is offset: the forearm runs beside the upper arm, so the links pass each other instead of colliding.</li>
+    <li><b>Far-corner margin.</b> The shoulder axis moves up from 12 to 18 cm. With the longer roll wrist (15 cm to the fingertips), a1 at carry height needs 92% of full reach, with no torque cost. A 30 cm forearm is the fallback.</li>
+    <li><b>Shoulder torque.</b> Long-body NEMA 17 (~0.65 Nm), 20:1, plus a spring counterbalance. The elbow motor sits behind the shoulder axis as a counterweight. 30:1 is the fallback.</li>
+    <li><b>Fifth motor.</b> Wrist roll (J5), so the fingers can line up with crowded pieces and the arm is useful for other jobs later. Six motors and six drivers in total.</li>
+    <li><b>Homing.</b> An AS5600 magnetic angle sensor on each joint output gives the absolute angle at power-up and catches skipped steps. The gripper homes against a switch.</li>
   </ul>
 </section>
 </div>
@@ -239,7 +240,7 @@ svg .mut{fill:var(--muted)}
 <script>
 (()=>{
 const NS="http://www.w3.org/2000/svg";
-const L1=28,L2=28,HS=12,GRIP=12,GRIPZ=3,LIFT=10,OFF=10,SQ=5,REACH=L1+L2;
+const L1=28,L2=28,HS=18,GRIP=15,GRIPZ=3,LIFT=10,OFF=10,SQ=5,REACH=L1+L2;
 const FILES="abcdefgh";
 const tray={x:28,y:6,name:"tray"};
 let sel="d8",lift=false;
@@ -288,7 +289,11 @@ function armPath(s,dash){const g=el("g",{opacity:dash?.55:1},side);const w=dash?
   el("line",{x1:s.ex,y1:Z(s.ez),x2:s.r,y2:Z(s.wz),stroke:"var(--arm)","stroke-width":2,"stroke-linecap":"round",...w},g);
   el("line",{x1:s.r,y1:Z(s.wz),x2:s.r,y2:Z(s.wz-GRIP+2),stroke:"var(--ink)","stroke-width":1.2,...w},g);
   el("path",{d:`M${s.r-1.6} ${Z(s.wz-GRIP+2)}H${s.r+1.6}M${s.r-1.4} ${Z(s.wz-GRIP+2)}V${Z(s.wz-GRIP)}M${s.r+1.4} ${Z(s.wz-GRIP+2)}V${Z(s.wz-GRIP)}`,stroke:"var(--ink)","stroke-width":.5,fill:"none"},g);
-  if(!dash){el("rect",{x:s.ex-2.1,y:Z(s.ez)-2.1,width:4.2,height:4.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
+  if(!dash){const ar=s.j2*Math.PI/180,mx=-6*Math.cos(ar),mz=HS-6*Math.sin(ar);
+    el("line",{x1:0,y1:Z(HS),x2:mx,y2:Z(mz),stroke:"var(--arm)","stroke-width":2.6,"stroke-linecap":"round"},g);
+    el("line",{x1:mx,y1:Z(mz),x2:s.ex,y2:Z(s.ez),stroke:"var(--ink)","stroke-width":.25,"stroke-dasharray":".8 .5"},g);
+    el("rect",{x:mx-2.1,y:Z(mz)-2.1,width:4.2,height:4.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
+    el("circle",{cx:s.ex,cy:Z(s.ez),r:2.4,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
     el("circle",{cx:s.ex,cy:Z(s.ez),r:.8,fill:"var(--arm)"},g);
     el("rect",{x:s.r-1.6,y:Z(s.wz)-1.6,width:3.2,height:3.2,fill:"var(--plate)",stroke:"var(--ink)","stroke-width":.25},g);
     el("circle",{cx:s.r,cy:Z(s.wz),r:.6,fill:"var(--arm)"},g)}}
@@ -326,8 +331,8 @@ function readout(){const p=sqPos(sel),s=ik(p.x,p.y,GRIPZ+GRIP+(lift?LIFT:0));con
   const items=s.ok?[["Target",sel==="tray"?"tray":sel],["Distance",s.r.toFixed(1)+" cm"],["J1 base",f(s.j1)],["J2 shoulder",f(s.j2)],["J3 elbow",f(s.j3)],["J4 wrist",f(s.j4)],["Extension",(100*s.d/REACH).toFixed(0)+"%"]]:[["Target",sel],["Status","out of reach"]];
   ro.innerHTML=items.map(([k,v])=>`<div><b>${k}</b><span>${v}</span></div>`).join("");
   const fl=document.getElementById("flags");fl.innerHTML="";
-  if(s.ok&&s.fold<40)fl.innerHTML+=`<p class="flag">Tight fold: the forearm sits only ${s.fold.toFixed(0)}° from the upper arm here. This is the hard case for the elbow, not the far corner.</p>`;
-  if(s.ok&&s.d/REACH>.9)fl.innerHTML+=`<p class="flag">Near full stretch (${(100*s.d/REACH).toFixed(0)}%). This is also where shoulder torque peaks, roughly the 6 Nm case from the handover.</p>`;
+  if(s.ok&&s.fold<40)fl.innerHTML+=`<p class="flag">Tight fold: the forearm sits only ${s.fold.toFixed(0)}° from the upper arm here. The offset elbow lets the links pass each other here.</p>`;
+  if(s.ok&&s.d/REACH>.9)fl.innerHTML+=`<p class="flag">Near full stretch (${(100*s.d/REACH).toFixed(0)}%). This is also where shoulder torque peaks, about 7 Nm with the roll wrist, before the counterbalance.</p>`;
   if(!s.ok)fl.innerHTML+=`<p class="flag bad">Out of reach with the current link lengths.</p>`;
   document.querySelectorAll("[data-pre]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pre===sel))}
 function ranges(){const acc={j1:[1e9,-1e9],j2:[1e9,-1e9],j3:[1e9,-1e9],j4:[1e9,-1e9]};const names=["tray"];for(const f of FILES)for(let r=1;r<=8;r++)names.push(f+r);
