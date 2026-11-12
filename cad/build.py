@@ -138,7 +138,7 @@ def collision_sweep():
     # inside the base: electronics, J1 motor, shelf, sensor bridge, floor must not overlap
     bp, bh, bd = A.groups()["base"]
     inside = {k: v for k, v in {**bh, **bp}.items() if k in ("computer", "esp32_board", "buck", "oled", "J1_motor",
-                                                           "j1_motor_shelf", "J1_sensor_bridge", "base_floor")}
+                                                           "j1_motor_shelf", "J1_sensor_bridge", "base_floor", "base_shell")}
     names_in = list(inside)
     hits = []
     for i, a in enumerate(names_in):

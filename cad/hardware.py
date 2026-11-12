@@ -166,7 +166,7 @@ COMPUTERS = {   # same 85 x 56 footprint and 58 x 49 hole pattern; h includes a 
     "PI4_1GB": dict(name="Raspberry Pi 4 Model B 1 GB", w=85.0, d=56.0, h=25.0, holes=(58.0, 49.0), hole_d=2.7, mass=0.046, price=35.0),
     "PI5_4GB": dict(name="Raspberry Pi 5 4 GB", w=85.0, d=56.0, h=30.0, holes=(58.0, 49.0), hole_d=2.7, mass=0.05, price=65.0),
 }
-ESP32_BOARD = dict(w=90.0, d=62.0, h=25.0, holes=(83.0, 55.0), hole_d=3.2)    # perfboard with ESP32 + 6 x TMC2209
+ESP32_BOARD = dict(w=90.0, d=70.0, h=25.0, holes=(84.0, 64.0), hole_d=3.2)    # 9 x 7 cm perfboard, see electronics/
 BUCK = dict(w=60.0, d=35.0, h=20.0, holes=(52.0, 27.0), hole_d=3.2)            # 24 V -> 5 V 5 A for the Pi
 DC_JACK_D = 8.0                                                                 # panel-mount 5.5/2.1 barrel jack
 BUTTON = dict(body=12.0, cap_d=11.5, hole_d=12.4)                             # 12 x 12 tactile switch with cap

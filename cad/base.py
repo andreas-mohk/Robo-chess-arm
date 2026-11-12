@@ -25,9 +25,9 @@ K1 = JointKit("J1", D1, C.joints["J1"].motor, TOP_T, C.joints["J1"].motor_r, C.j
 
 # electronics layout (world X, Y of each board centre) -- move freely, the build checks for clashes
 LAYOUT = {
-    "computer": (-52.0, -50.0),
-    "esp32_board": (48.0, -52.0),
-    "buck": (-55.0, 42.0),
+    "computer": (-50.0, -46.0),
+    "esp32_board": (39.0, -51.0),
+    "buck": (55.0, 38.0),
 }
 
 
@@ -55,12 +55,15 @@ def base_shell():
     a = radians(C.joints["J1"].motor_angle + 180)
     s = s.cut(cq.Workplane("XY").workplane(offset=Z_BASE_TOP - TOP_T).center(55 * cos(a), 55 * sin(a))
               .slot2D(34, 12, C.joints["J1"].motor_angle + 90).extrude(TOP_T))
+    # clearance pocket for the J1 motor shaft tip under the top plate
+    mx, my = K1.mxy
+    s = s.cut(cq.Workplane("XY").workplane(offset=Z_BASE_TOP - TOP_T).center(mx, my).circle(4.5).extrude(TOP_T - 1.5))
     # motor shelf posts (M3 into the top plate)
     for p in _shelf_posts():
         s = s.cut(cq.Workplane("XY").workplane(offset=Z_BASE_TOP - TOP_T).center(*p).circle(1.25).extrude(TOP_T - 1))
     # front panel: OLED window and buttons (front = +Y, faces the board and the player)
     o = OLED[C.oled]
-    ox, oz = 52.0, H / 2 + 6
+    ox, oz = 52.0, H / 2 + 3
     s = s.cut(cq.Workplane("XZ").workplane(offset=-Dp / 2 - 1).center(ox, oz + o["window_dy"])
               .rect(o["window_w"], o["window_h"]).extrude(WALL + 2))
     s = s.cut(cq.Workplane("XZ").workplane(offset=-Dp / 2 - 1)
@@ -79,8 +82,8 @@ def base_shell():
                   .rect(5, 22).extrude(WALL + 2))
     # floor screw bosses in the corners
     corners = [(sx * (W / 2 - 10), sy * (Dp / 2 - 10)) for sx in (1, -1) for sy in (1, -1)]
-    bosses = cq.Workplane("XY").pushPoints(corners).circle(5).extrude(H - TOP_T)
-    bosses = bosses.cut(cq.Workplane("XY").pushPoints(corners).circle(1.25).extrude(20))
+    bosses = cq.Workplane("XY").workplane(offset=FLOOR_T).pushPoints(corners).circle(5).extrude(H - TOP_T - FLOOR_T)
+    bosses = bosses.cut(cq.Workplane("XY").workplane(offset=FLOOR_T).pushPoints(corners).circle(1.25).extrude(20))
     return s.union(bosses)
 
 
@@ -162,7 +165,7 @@ def electronics():
         cx, cy = LAYOUT[key]
         out[key] = box(cx, cy, z0 + spec["h"] / 2, spec["w"], spec["d"], spec["h"])
     o = OLED[C.oled]
-    out["oled"] = box(52.0, Dp / 2 - WALL - 3, H / 2 + 6, o["board_w"], 4, o["board_h"])
+    out["oled"] = box(52.0, Dp / 2 - WALL - 3, H / 2 + 3, o["board_w"], 4, o["board_h"])
     return out
 
 

@@ -105,7 +105,7 @@ class Config:
     joints: dict = field(default_factory=lambda: {
         # J1 motor_angle: degrees from +X in the base (world). J2 motor_angle: degrees in the tower plane
         # from forward (+Y) towards up (+Z). J3/J4 motors always sit on the tail of the previous link.
-        "J1": JointCfg(BIG, "17HS08", motor_r=55.0, motor_angle=60.0),     # pancake: hangs below the belt inside the base
+        "J1": JointCfg(BIG, "17HS08", motor_r=55.0, motor_angle=90.0),     # pancake: hangs below the belt inside the base
         "J2": JointCfg(BIG, "17HS8401", motor_r=80.0, motor_angle=150.0),
         "J3": JointCfg(BIG, "17HS13"),     # motor on the upper-arm tail; belt length from tail3 + L1
         "J4": JointCfg(SMALL, "17HS13"),   # motor on the forearm tail; belt length from tail4 + L2

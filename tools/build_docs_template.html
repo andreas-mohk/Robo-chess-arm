@@ -1,0 +1,190 @@
+<meta charset="utf-8">
+<title>Chess Arm Build Docs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky header with three tabs; each tab is a two-column workspace (index left, paper viewer right) that stacks on phones */
+:root{
+  --paper:#F2F4F1; --plate:#FBFCFA; --ink:#1C2320; --muted:#5D6A64; --rule:#CCD4CF; --arm:#0E6B66; --arm-soft:#0E6B6614; --hot:#B9770E;
+  --sheet:#ffffff; --shadow:0 1px 2px #0002, 0 6px 24px #0001;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#111614;--plate:#171D1A;--ink:#E3EAE6;--muted:#93A29B;--rule:#2D3833;--arm:#46C4B9;--arm-soft:#46C4B91f;--hot:#E6B44A;--sheet:#f4f4f1;--shadow:0 1px 2px #0006,0 6px 24px #0004;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#111614;--plate:#171D1A;--ink:#E3EAE6;--muted:#93A29B;--rule:#2D3833;--arm:#46C4B9;--arm-soft:#46C4B91f;--hot:#E6B44A;--sheet:#f4f4f1;--shadow:0 1px 2px #0006,0 6px 24px #0004;color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--plate)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--plate);border-bottom:1px solid var(--rule)}
+.bar{max-width:1400px;margin:0 auto;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+h1{font:600 22px/1.1 var(--display);margin:0}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{font:500 14px/1 var(--body);color:var(--ink);text-decoration:none;padding:9px 14px;border-radius:999px;border:1px solid transparent}
+nav a:hover{border-color:var(--rule)}
+nav a[aria-current="page"]{background:var(--arm);color:var(--plate)}
+main{max-width:1400px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.work{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.work{grid-template-columns:1fr}.index{max-height:260px}}
+.index{background:var(--plate);border:1px solid var(--rule);border-radius:6px;max-height:calc(100vh - 140px);overflow:auto;position:sticky;top:90px}
+.index h4{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 14px 6px}
+.item{display:flex;gap:10px;align-items:center;padding:7px 14px;cursor:pointer;border-left:3px solid transparent}
+.item:hover{background:var(--arm-soft)}
+.item[aria-current="true"]{border-left-color:var(--arm);background:var(--arm-soft)}
+.item .n{font:500 12px/1 var(--mono);color:var(--muted);min-width:22px;font-variant-numeric:tabular-nums}
+.item .t{font-size:13.5px;line-height:1.3;flex:1;min-width:0}
+.item input{accent-color:var(--arm);margin:0}
+.item.done .t{color:var(--muted);text-decoration:line-through}
+.rep{font:600 11px/1 var(--mono);color:var(--plate);background:var(--arm);border-radius:999px;padding:3px 6px}
+.viewer{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sheet{background:var(--sheet);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
+.sheet img{display:block;width:100%;height:auto}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl .grow{flex:1}
+button,.btn{font:500 13px/1 var(--mono);color:var(--ink);background:var(--plate);border:1px solid var(--rule);border-radius:4px;padding:9px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+button:hover,.btn:hover{border-color:var(--arm)}
+button.primary{background:var(--arm);border-color:var(--arm);color:var(--plate)}
+button:focus-visible,.btn:focus-visible,.item:focus-visible,nav a:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.pos{font:500 13px/1 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.stitle{font:600 20px/1.2 var(--display);margin:0}
+.e-grid{display:flex;flex-direction:column;gap:28px}
+.e-sec{display:flex;flex-direction:column;gap:10px}
+.e-sec h2{font:600 22px/1.2 var(--display);margin:0}
+.e-sec p{margin:0;max-width:70ch;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.two>*{min-width:0}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.doc{background:var(--plate);border:1px solid var(--rule);border-radius:6px;padding:16px 20px}
+.doc h3{font:600 17px/1.2 var(--display);margin:22px 0 8px}
+.doc h3:first-child{margin-top:0}
+.doc p{margin:6px 0;max-width:80ch}
+.doc ul,.doc ol{margin:6px 0;padding-left:22px;max-width:80ch}
+.tbl{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:13px;min-width:100%}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font:500 11px/1.2 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+td{font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.92em}
+details summary{cursor:pointer;font-weight:500}
+.hint{font-size:13px;color:var(--muted)}
+</style>
+
+<header>
+  <div class="bar">
+    <div><div class="eyebrow">Rev D · generated from the CAD</div><h1>Chess Arm Build Docs</h1></div>
+    <nav aria-label="Sections">
+      <a href="#guide" data-tab="guide">Assembly guide</a>
+      <a href="#drawings" data-tab="drawings">Drawings</a>
+      <a href="#electronics" data-tab="electronics">Electronics</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="tab-guide" class="work">
+    <div class="index" id="g-index" aria-label="Steps"></div>
+    <div class="viewer">
+      <div class="ctrl">
+        <button id="g-prev" aria-label="Previous step">← Prev</button>
+        <button id="g-next" class="primary" aria-label="Next step">Next →</button>
+        <span class="pos" id="g-pos"></span>
+        <span class="grow"></span>
+        <label class="hint"><input type="checkbox" id="g-done"> Step done</label>
+        <a class="btn" href="guide/chess_arm_assembly_guide.pdf" target="_blank" rel="noopener">PDF</a>
+      </div>
+      <p class="stitle" id="g-title"></p>
+      <div class="sheet"><img id="g-img" alt=""></div>
+      <p class="hint">Arrow keys move between steps. New parts are black, parts already in place are grey. The hardware box shows each screw at actual size when the PDF is printed at 100 %.</p>
+    </div>
+  </section>
+
+  <section id="tab-drawings" class="work" hidden>
+    <div class="index" id="d-index" aria-label="Sheets"></div>
+    <div class="viewer">
+      <div class="ctrl">
+        <button id="d-prev" aria-label="Previous sheet">← Prev</button>
+        <button id="d-next" class="primary" aria-label="Next sheet">Next →</button>
+        <span class="pos" id="d-pos"></span>
+        <span class="grow"></span>
+        <a class="btn" id="d-open" href="#" target="_blank" rel="noopener">Open full size</a>
+
+      </div>
+      <p class="stitle" id="d-title"></p>
+      <div class="sheet"><img id="d-img" alt=""></div>
+      <p class="hint">A3 sheets, third-angle projection, millimetres. Hidden edges dashed. Identical parts appear once with their quantity in the title block. The combined 51-page PDF is in the repo at docs/drawings/chess_arm_drawings.pdf.</p>
+    </div>
+  </section>
+
+  <section id="tab-electronics" hidden>
+    <div class="e-grid">
+      <div class="e-sec">
+        <h2>Schematic</h2>
+        <p>Two sheets, KiCad style: parts connect through net labels with the same name. Sheet 1 covers power, the ESP32 and the six TMC2209 drivers. Sheet 2 covers the sensor hub, the Raspberry Pi 4 and the user interface.</p>
+        <div class="sheet"><a href="electronics/schematic_1.svg" target="_blank" rel="noopener"><img src="electronics/schematic_1.svg" alt="Schematic sheet 1: power, controller, stepper drivers"></a></div>
+        <div class="sheet"><a href="electronics/schematic_2.svg" target="_blank" rel="noopener"><img src="electronics/schematic_2.svg" alt="Schematic sheet 2: sensor hub, Raspberry Pi, user interface"></a></div>
+      </div>
+      <div class="e-sec">
+        <h2>Main board on perfboard (90 × 70 mm)</h2>
+        <p>Component side and the mirrored solder side, hole for hole. Thick lines are bare rails on the solder side; thin lines are insulated wires. Every connection in the netlist is checked against these wires.</p>
+        <div class="two">
+          <div class="sheet"><a href="electronics/perfboard_top.svg" target="_blank" rel="noopener"><img src="electronics/perfboard_top.svg" alt="Perfboard component side"></a></div>
+          <div class="sheet"><a href="electronics/perfboard_bottom.svg" target="_blank" rel="noopener"><img src="electronics/perfboard_bottom.svg" alt="Perfboard solder side, mirrored"></a></div>
+        </div>
+      </div>
+      <div class="e-sec">
+        <h2>Pin map</h2>
+        <div class="doc"><!--PINMAP--></div>
+      </div>
+      <div class="e-sec">
+        <details class="doc"><summary>Wiring list for the perfboard (every wire, hole to hole)</summary><!--WIRING--></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(()=>{
+const DATA=/*DATA*/null;
+const $=id=>document.getElementById(id);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const done=new Set(store.get("chessarm-done")||[]);
+
+function viewer(prefix,list,label,groupOf){
+  const idx=$(prefix+"-index");let cur=0;
+  let lastGroup=null;
+  list.forEach((p,i)=>{
+    const g=groupOf(p,i);
+    if(g!==lastGroup){const h=document.createElement("h4");h.textContent=g;idx.appendChild(h);lastGroup=g}
+    const el=document.createElement("div");el.className="item";el.tabIndex=0;el.dataset.i=i;
+    el.innerHTML=`<span class="n">${p.no||"–"}</span><span class="t"></span>${p.repeat&&p.repeat!=="x1"?`<span class="rep">${p.repeat}</span>`:""}`;
+    el.querySelector(".t").textContent=p.title;
+    el.addEventListener("click",()=>show(i));
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();show(i)}});
+    idx.appendChild(el);
+  });
+  function paintDone(){if(prefix!=="g")return;idx.querySelectorAll(".item").forEach(el=>{el.classList.toggle("done",done.has(list[+el.dataset.i].file))})}
+  function show(i){
+    cur=Math.max(0,Math.min(list.length-1,i));const p=list[cur];
+    $(prefix+"-img").src=p.file;$(prefix+"-img").alt=p.title;
+    $(prefix+"-title").textContent=(p.no?`${label} ${p.no}: `:"")+p.title;
+    $(prefix+"-pos").textContent=`${cur+1} / ${list.length}`;
+    idx.querySelectorAll(".item").forEach(el=>el.setAttribute("aria-current",+el.dataset.i===cur));
+    if(prefix==="d")$("d-open").href=p.file;
+    if(prefix==="g")$("g-done").checked=done.has(p.file);
+    store.set(prefix+"-cur",cur);
+  }
+  $(prefix+"-prev").addEventListener("click",()=>show(cur-1));
+  $(prefix+"-next").addEventListener("click",()=>show(cur+1));
+  if(prefix==="g")$("g-done").addEventListener("change",e=>{const f=list[cur].file;e.target.checked?done.add(f):done.delete(f);store.set("chessarm-done",[...done]);paintDone()});
+  paintDone();show(store.get(prefix+"-cur")||0);
+  return {next:()=>show(cur+1),prev:()=>show(cur-1)};
+}
+const g=viewer("g",DATA.guide,"Step",(p,i)=>i<2?"Start":(p.title.split(":")[0].startsWith("Drive")?"Cycloidal drives":p.no<=19?"Base and turntable":p.no<=31?"Arm sections":"Final assembly"));
+const d=viewer("d",DATA.drawings,"Sheet",(p,i)=>p.no===1?"General arrangement":p.no<=9?"Assemblies":"Printed parts");
+const tabs=["guide","drawings","electronics"];
+function route(){const t=tabs.includes(location.hash.slice(1))?location.hash.slice(1):"guide";
+  tabs.forEach(x=>{$("tab-"+x).hidden=x!==t;document.querySelector(`nav a[data-tab="${x}"]`).setAttribute("aria-current",x===t?"page":"false")});}
+addEventListener("hashchange",route);route();
+addEventListener("keydown",e=>{if(e.target.closest("input,textarea,select"))return;const t=location.hash.slice(1)||"guide";const v=t==="drawings"?d:t==="guide"?g:null;if(!v)return;
+  if(e.key==="ArrowRight"){v.next();e.preventDefault()}if(e.key==="ArrowLeft"){v.prev();e.preventDefault()}});
+})();
+</script>

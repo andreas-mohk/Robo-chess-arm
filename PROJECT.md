@@ -3,6 +3,7 @@
 From-scratch articulated arm that plays chess against Ekke on a physical board.
 
 - **3D model:** [`docs/arm3d.html`](docs/arm3d.html) (pose joints, jump to squares, play a move)
+- **Build docs:** [`docs/build-docs.html`](docs/build-docs.html): assembly guide (36 steps, PDF in `docs/guide/`), drawing set (51 A3 sheets, PDF in `docs/drawings/`), electronics (schematic, perfboard, pin map in `docs/electronics/`)
 - **CAD sources:** [`cad/`](cad/) (see [`cad/README.md`](cad/README.md) for how to change parameters)
 - **Last build report:** [`docs/build_report.md`](docs/build_report.md) · **Bill of materials (for sourcing):** [`docs/bom_sourcing.csv`](docs/bom_sourcing.csv) / [`.md`](docs/bom_sourcing.md)
 - Concept sheet (rev B, partly superseded): [`docs/diagrams.html`](docs/diagrams.html)
@@ -71,6 +72,7 @@ Drive parameters (walls, undercut, pin lengths), cycloid meshing at 6 angles per
 - 2026-11-10: Project started. Concept diagrams.
 - 2026-11-10: Rev B decisions. First shoulder drive model.
 - 2026-11-10: Rev C: complete parametric arm in CadQuery (base, turntable, tower, links, 4 drives, wrist, gripper), build checks, BOM, 3D viewer.
+- 2026-11-12: Drawing set (`cad/drawings.py`), IKEA-style assembly guide (`cad/guide.py`), electronics (`electronics/`: netlist, KiCad-style schematic, perfboard layout, pin map). The base layout was adjusted for the real 90 × 70 perfboard: J1 motor now points forward (90°), the floor bosses moved off the floor, the J1 shaft got a clearance pocket and the OLED was lowered. The interior check now includes the base shell.
 - 2026-11-10: Sourcing BOM (`cad/bom.py`). The drive stack bolts now use standard lengths (M3×40 on J1–J3, M3×35 on J4), with nut pockets sized to suit.
 - 2026-11-10: Rev D: stronger gripper, roll bearing, camera pole with field-of-view check, Pi 4 1 GB, park pose moved beside the base and out of the camera's view.
 

@@ -1,0 +1,599 @@
+[
+ {
+  "no": 1,
+  "title": "Drive J1-J3: ring pins",
+  "note": "Press the 21 dowels into the housing ring.\nTap them flush with the ring's top face.",
+  "hardware": [
+   [
+    21,
+    "pin",
+    "\u00d85 x 20"
+   ]
+  ],
+  "repeat": "x3"
+ },
+ {
+  "no": 2,
+  "title": "Drive J1-J3: output flange",
+  "note": "Press the output pins into the flange, then the small bearing\ninto the flange's centre seat (from the pin side).",
+  "hardware": [
+   [
+    6,
+    "pin",
+    "\u00d85 x 20"
+   ],
+   [
+    1,
+    "bearing",
+    "6801"
+   ]
+  ],
+  "repeat": "x3"
+ },
+ {
+  "no": 3,
+  "title": "Drive J1-J3: bearings in cover and cap",
+  "note": "Press one small bearing into the back cover and the big bearing\ninto the output cap. Push on the outer ring only.",
+  "hardware": [
+   [
+    1,
+    "bearing",
+    "6801"
+   ],
+   [
+    1,
+    "bearing",
+    "6806"
+   ]
+  ],
+  "repeat": "x3"
+ },
+ {
+  "no": 4,
+  "title": "Drive J1-J3: input shaft",
+  "note": "Slide one bearing over each eccentric: the first from the pulley end,\nthe second from the other end.",
+  "hardware": [
+   [
+    2,
+    "bearing",
+    "6802"
+   ]
+  ],
+  "repeat": "x3"
+ },
+ {
+  "no": 5,
+  "title": "Drive J1-J3: cover, shaft, ring",
+  "note": "Shaft into the cover bearing, then lower the ring with its pins\ninto the cover's pin holes.",
+  "hardware": [],
+  "repeat": "x3"
+ },
+ {
+  "no": 6,
+  "title": "Drive J1-J3: discs",
+  "note": "Drop in disc A, then disc B. Turn the shaft a little until each disc\nfalls flat between the pins.",
+  "hardware": [],
+  "repeat": "x3"
+ },
+ {
+  "no": 7,
+  "title": "Drive J1-J3: output flange and cap",
+  "note": "Feed the flange pins through both discs, onto the shaft's front journal.\nCap on top. Keep the stack together until it is bolted down.",
+  "hardware": [],
+  "repeat": "x3"
+ },
+ {
+  "no": 8,
+  "title": "Drive J4: ring pins",
+  "note": "Press the 16 dowels into the housing ring.\nTap them flush with the ring's top face.",
+  "hardware": [
+   [
+    16,
+    "pin",
+    "\u00d83 x 16"
+   ]
+  ],
+  "repeat": "x1"
+ },
+ {
+  "no": 9,
+  "title": "Drive J4: output flange",
+  "note": "Press the output pins into the flange, then the small bearing\ninto the flange's centre seat (from the pin side).",
+  "hardware": [
+   [
+    6,
+    "pin",
+    "\u00d83 x 18"
+   ],
+   [
+    1,
+    "bearing",
+    "6800"
+   ]
+  ],
+  "repeat": "x1"
+ },
+ {
+  "no": 10,
+  "title": "Drive J4: bearings in cover and cap",
+  "note": "Press one small bearing into the back cover and the big bearing\ninto the output cap. Push on the outer ring only.",
+  "hardware": [
+   [
+    1,
+    "bearing",
+    "6800"
+   ],
+   [
+    1,
+    "bearing",
+    "6804"
+   ]
+  ],
+  "repeat": "x1"
+ },
+ {
+  "no": 11,
+  "title": "Drive J4: input shaft",
+  "note": "Slide one bearing over each eccentric: the first from the pulley end,\nthe second from the other end.",
+  "hardware": [
+   [
+    2,
+    "bearing",
+    "6801"
+   ]
+  ],
+  "repeat": "x1"
+ },
+ {
+  "no": 12,
+  "title": "Drive J4: cover, shaft, ring",
+  "note": "Shaft into the cover bearing, then lower the ring with its pins\ninto the cover's pin holes.",
+  "hardware": [],
+  "repeat": "x1"
+ },
+ {
+  "no": 13,
+  "title": "Drive J4: discs",
+  "note": "Drop in disc A, then disc B. Turn the shaft a little until each disc\nfalls flat between the pins.",
+  "hardware": [],
+  "repeat": "x1"
+ },
+ {
+  "no": 14,
+  "title": "Drive J4: output flange and cap",
+  "note": "Feed the flange pins through both discs, onto the shaft's front journal.\nCap on top. Keep the stack together until it is bolted down.",
+  "hardware": [],
+  "repeat": "x1"
+ },
+ {
+  "no": 15,
+  "title": "Base: electronics on the floor",
+  "note": "Pi 4, the controller perfboard and the buck converter go on their standoffs.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M2.5 x 6"
+   ],
+   [
+    8,
+    "screw",
+    "M3 x 6"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 16,
+  "title": "Base: J1 drive",
+  "note": "Drive on top of the base, bolts from the cap side,\nnuts in the pockets under the top plate.",
+  "hardware": [
+   [
+    6,
+    "screw",
+    "M3 x 40"
+   ],
+   [
+    6,
+    "nut",
+    "M3 nut"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 17,
+  "title": "Base: J1 belt and sensor (from below)",
+  "note": "Pulley onto the shaft hex (grub screw), magnet cap onto the rod, motor on its shelf,\nbelt on, shelf up onto its posts, sensor bridge last.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M3 x 8"
+   ],
+   [
+    2,
+    "screw",
+    "M3 x 12"
+   ],
+   [
+    2,
+    "screw",
+    "M3 x 35"
+   ],
+   [
+    2,
+    "screw",
+    "M2 x 6"
+   ],
+   [
+    1,
+    "screw",
+    "M3 x 4"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 18,
+  "title": "Base: close it",
+  "note": "OLED, 3 buttons, DC jack and switch into the shell. Wire up (see the\nelectronics sheets), then screw the floor on.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M3 x 8"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 19,
+  "title": "Turntable",
+  "note": "Grease the race, lay in the 64 balls, set the turntable on the J1 clamp.\nScrews go through turntable and clamp into the drive's hub.",
+  "hardware": [
+   [
+    64,
+    "other",
+    "\u00d86 steel balls"
+   ],
+   [
+    6,
+    "screw",
+    "M3 x 16"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 20,
+  "title": "Tower: J2 drive and motor",
+  "note": "Drive against the tower plate (6 bolts, nuts on the far side).\nMotor on the drive side, shaft through the slotted holes.",
+  "hardware": [
+   [
+    6,
+    "screw",
+    "M3 x 40"
+   ],
+   [
+    6,
+    "nut",
+    "M3 nut"
+   ],
+   [
+    4,
+    "screw",
+    "M3 x 10"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 21,
+  "title": "Tower: J2 belt and sensor",
+  "note": "On the back of the tower: pulley, magnet cap, belt, then the sensor bridge.\nSlide the motor to tension the belt, then tighten.",
+  "hardware": [
+   [
+    2,
+    "screw",
+    "M3 x 35"
+   ],
+   [
+    2,
+    "screw",
+    "M2 x 6"
+   ],
+   [
+    1,
+    "screw",
+    "M3 x 4"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 22,
+  "title": "Tower onto the turntable",
+  "note": "Four M4 bolts through the tower foot and the turntable.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M4 x 20"
+   ],
+   [
+    4,
+    "nut",
+    "M4 nyloc"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 23,
+  "title": "Upper arm: tube and fittings",
+  "note": "Cut the 15x15x1.5 tube to 190 mm. Push it into both fittings,\nthen bolt across each socket.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M4 x 30"
+   ],
+   [
+    4,
+    "nut",
+    "M4 nyloc"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 24,
+  "title": "Upper arm: J3 drive and motor",
+  "note": "Drive under the elbow plate, motor under the tail plate.\nBelt side stays on top.",
+  "hardware": [
+   [
+    6,
+    "screw",
+    "M3 x 40"
+   ],
+   [
+    6,
+    "nut",
+    "M3 nut"
+   ],
+   [
+    4,
+    "screw",
+    "M3 x 10"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 25,
+  "title": "Upper arm: J3 belt and sensor",
+  "note": "Pulleys, the long belt, magnet cap, sensor bridge.\nSlide the motor along its slots to tension the belt.",
+  "hardware": [
+   [
+    2,
+    "screw",
+    "M3 x 35"
+   ],
+   [
+    2,
+    "screw",
+    "M2 x 6"
+   ],
+   [
+    1,
+    "screw",
+    "M3 x 4"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 26,
+  "title": "Forearm: tube and fittings",
+  "note": "Same as the upper arm: 190 mm tube, 2 bolts per socket.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M4 x 30"
+   ],
+   [
+    4,
+    "nut",
+    "M4 nyloc"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 27,
+  "title": "Forearm: J4 drive, motor, belt, sensor",
+  "note": "Small drive at the wrist end, motor on the tail.\nBelt, pulleys and sensor bridge on the other side of the plate.",
+  "hardware": [
+   [
+    8,
+    "screw",
+    "M3 x 35"
+   ],
+   [
+    6,
+    "nut",
+    "M3 nut"
+   ],
+   [
+    4,
+    "screw",
+    "M3 x 10"
+   ],
+   [
+    2,
+    "screw",
+    "M2 x 6"
+   ],
+   [
+    1,
+    "screw",
+    "M3 x 4"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 28,
+  "title": "Wrist: roll bearing, hub, roll motor",
+  "note": "Bearing into the shelf pocket from above, hub through it, then the pancake\nmotor on top: its D-shaft slides into the hub.",
+  "hardware": [
+   [
+    1,
+    "bearing",
+    "6804"
+   ],
+   [
+    4,
+    "screw",
+    "M3 x 10"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 29,
+  "title": "Gripper: jaws",
+  "note": "Press two LM6UU bushings into each jaw.",
+  "hardware": [
+   [
+    4,
+    "other",
+    "LM6UU"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 30,
+  "title": "Gripper: rods, motor, pinion",
+  "note": "Rods through the end wall and both jaws. Motor on the plate, pinion on its shaft\nwith both jaws at full open. Home switch on the end wall.",
+  "hardware": [
+   [
+    2,
+    "screw",
+    "M3 x 8"
+   ],
+   [
+    2,
+    "nut",
+    "M3 nut"
+   ],
+   [
+    2,
+    "screw",
+    "M2 x 10"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 31,
+  "title": "Gripper onto the wrist",
+  "note": "Three screws through the hub flange into the gripper's top plate.",
+  "hardware": [
+   [
+    3,
+    "screw",
+    "M3 x 12"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 32,
+  "title": "Upper arm onto J2",
+  "note": "Upper arm's round plate onto the J2 clamp: six screws through plate and clamp\ninto the J2 hub.",
+  "hardware": [
+   [
+    6,
+    "screw",
+    "M3 x 16"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 33,
+  "title": "Forearm onto J3",
+  "note": "Forearm's round plate onto the J3 clamp, six screws.",
+  "hardware": [
+   [
+    6,
+    "screw",
+    "M3 x 16"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 34,
+  "title": "Wrist onto J4",
+  "note": "Wrist bracket onto the J4 clamp, four M2.5 screws into the J4 hub.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M2.5 x 16"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 35,
+  "title": "Camera pole",
+  "note": "Cut the 20 mm tube to 669 (pole) and 277 mm (boom).\nFoot, pole, tee, boom, mount, camera plate. Level the camera with the tilt bolt.",
+  "hardware": [
+   [
+    4,
+    "screw",
+    "M4 x 35"
+   ],
+   [
+    2,
+    "screw",
+    "M4 x 40"
+   ],
+   [
+    6,
+    "nut",
+    "M4 nyloc"
+   ],
+   [
+    1,
+    "other",
+    "1/4-20 x 10"
+   ]
+  ],
+  "repeat": null
+ },
+ {
+  "no": 36,
+  "title": "Baseplate",
+  "note": "Arm base, chessboard and camera pole on one plywood plate. Board edge 100 mm from\nthe base axis, centred; pole at X -300, Y 300. Bolt base and pole foot down.",
+  "hardware": [
+   [
+    8,
+    "screw",
+    "M4 x 25"
+   ],
+   [
+    8,
+    "nut",
+    "M4 nyloc"
+   ]
+  ],
+  "repeat": null
+ }
+]
